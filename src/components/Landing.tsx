@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import OperatorModel from './OperatorModel';
+import TechBalls from './TechBalls';
 import './styles/Landing.css';
 
 const Landing = () => {
@@ -242,7 +243,7 @@ const Landing = () => {
               </div>
             </div>
             <div className="canvas-wrapper">
-              <canvas ref={canvasRef} className="topology-canvas"></canvas>
+              <TechBalls />
             </div>
           </div>
 

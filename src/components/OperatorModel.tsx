@@ -123,6 +123,9 @@ const OperatorModel = () => {
             
             // Adjust materials to cyan/purple design
             characterObj.traverse((child: any) => {
+              if (child.name === "Plane004" || child.name === "screenlight") {
+                child.visible = false;
+              }
               if (child.isMesh) {
                 const mesh = child as THREE.Mesh;
                 mesh.castShadow = true;
