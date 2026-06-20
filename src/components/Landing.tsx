@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import OperatorModel from './OperatorModel';
 import './styles/Landing.css';
 
 const Landing = () => {
@@ -212,35 +213,47 @@ const Landing = () => {
           </div>
         </div>
 
-        <div className="landing-right glass-panel">
-          <div className="right-card-header">
-            <span className="card-lbl">NODE REPLICAS STATUS</span>
-            <span className="card-ping">Live telemetry</span>
+        <div className="landing-right-column">
+          <div className="landing-right glass-panel">
+            <div className="right-card-header">
+              <span className="card-lbl">NODE REPLICAS STATUS</span>
+              <span className="card-ping">Live telemetry</span>
+            </div>
+            <div className="nodes-telemetry-grid">
+              <div className="telemetry-item">
+                <span className="t-label">ReplicaSets (K8s)</span>
+                <span className="t-val">8 / 8 Active</span>
+                <div className="t-progress-bar"><div className="t-fill t-green" style={{ width: '100%' }}></div></div>
+              </div>
+              <div className="telemetry-item">
+                <span className="t-label">API Gateway Ping</span>
+                <span className="t-val">12 ms</span>
+                <div className="t-progress-bar"><div className="t-fill t-cyan" style={{ width: '25%' }}></div></div>
+              </div>
+              <div className="telemetry-item">
+                <span className="t-label">Container CPU Load</span>
+                <span className="t-val">18% Avg</span>
+                <div className="t-progress-bar"><div className="t-fill t-purple" style={{ width: '18%' }}></div></div>
+              </div>
+              <div className="telemetry-item">
+                <span className="t-label">Uptime Integrity</span>
+                <span className="t-val">99.98%</span>
+                <div className="t-progress-bar"><div className="t-fill t-green" style={{ width: '99.9%' }}></div></div>
+              </div>
+            </div>
+            <div className="canvas-wrapper">
+              <canvas ref={canvasRef} className="topology-canvas"></canvas>
+            </div>
           </div>
-          <div className="nodes-telemetry-grid">
-            <div className="telemetry-item">
-              <span className="t-label">ReplicaSets (K8s)</span>
-              <span className="t-val">8 / 8 Active</span>
-              <div className="t-progress-bar"><div className="t-fill t-green" style={{ width: '100%' }}></div></div>
+
+          <div className="landing-operator-card glass-panel">
+            <div className="right-card-header">
+              <span className="card-lbl">OPERATOR BIO-LINK (3D)</span>
+              <span className="card-ping">Status: Active</span>
             </div>
-            <div className="telemetry-item">
-              <span className="t-label">API Gateway Ping</span>
-              <span className="t-val">12 ms</span>
-              <div className="t-progress-bar"><div className="t-fill t-cyan" style={{ width: '25%' }}></div></div>
+            <div className="operator-canvas-wrapper">
+              <OperatorModel />
             </div>
-            <div className="telemetry-item">
-              <span className="t-label">Container CPU Load</span>
-              <span className="t-val">18% Avg</span>
-              <div className="t-progress-bar"><div className="t-fill t-purple" style={{ width: '18%' }}></div></div>
-            </div>
-            <div className="telemetry-item">
-              <span className="t-label">Uptime Integrity</span>
-              <span className="t-val">99.98%</span>
-              <div className="t-progress-bar"><div className="t-fill t-green" style={{ width: '99.9%' }}></div></div>
-            </div>
-          </div>
-          <div className="canvas-wrapper">
-            <canvas ref={canvasRef} className="topology-canvas"></canvas>
           </div>
         </div>
       </div>
