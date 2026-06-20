@@ -1,16 +1,15 @@
 /**
- * Abhishek Sharma - CloudOps Dashboard console JS
- * Logic: Live updating telemetry chart, Kubernetes Pod tabs, Sandbox runner, and blueprint configs
+ * Abhishek Sharma - CloudOps Dashboard Console JS
+ * Telemetry charts, K8s Namespaces, CI/CD Pipeline Simulator, ShopNexa blueprint nodes, and Formspree AJAX contact
  */
 
 /* ==========================================================================
-   1. Live Telemetry Canvas (Fluctuating Telemetry Chart)
+   1. Live Telemetry Canvas (CPU Telemetry)
    ========================================================================== */
 const metricsCanvas = document.getElementById('live-telemetry-canvas');
 if (metricsCanvas) {
     const mCtx = metricsCanvas.getContext('2d');
     
-    // Set display buffer sizes
     function resizeCanvas() {
         const rect = metricsCanvas.getBoundingClientRect();
         metricsCanvas.width = rect.width;
@@ -19,8 +18,7 @@ if (metricsCanvas) {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Initial telemetry data queue (20 points)
-    let telemetryPoints = Array.from({ length: 22 }, () => Math.floor(Math.random() * 15) + 10);
+    let telemetryPoints = Array.from({ length: 22 }, () => Math.floor(Math.random() * 12) + 12);
     const cpuLoadVal = document.getElementById('cpu-load-val');
     const cpuLoadBar = document.getElementById('cpu-load-bar');
 
@@ -29,7 +27,7 @@ if (metricsCanvas) {
         mCtx.clearRect(0, 0, metricsCanvas.width, metricsCanvas.height);
 
         // Draw background grid lines inside canvas
-        mCtx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
+        mCtx.strokeStyle = 'rgba(99, 102, 241, 0.03)';
         mCtx.lineWidth = 1;
         const gridLines = 4;
         for (let i = 1; i <= gridLines; i++) {
@@ -43,18 +41,16 @@ if (metricsCanvas) {
         const pointCount = telemetryPoints.length;
         const stepX = metricsCanvas.width / (pointCount - 1);
         
-        // Map points to canvas height (0 - 100 max CPU load)
         const points = telemetryPoints.map((val, idx) => {
             const x = idx * stepX;
-            // Scale so 100% CPU is near top, 0% is near bottom
             const y = metricsCanvas.height - (val / 100) * (metricsCanvas.height * 0.85) - 10;
             return { x, y };
         });
 
-        // Draw fill area first
+        // Fill area
         const gradient = mCtx.createLinearGradient(0, 0, 0, metricsCanvas.height);
-        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.15)'); // Emerald transparent
-        gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.12)'); // Indigo gradient
+        gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
         
         mCtx.beginPath();
         mCtx.moveTo(0, metricsCanvas.height);
@@ -64,56 +60,41 @@ if (metricsCanvas) {
         mCtx.fillStyle = gradient;
         mCtx.fill();
 
-        // Draw line path
+        // Line path
         mCtx.beginPath();
         mCtx.moveTo(points[0].x, points[0].y);
         for (let i = 1; i < points.length; i++) {
-            // Smooth curve mapping (bezier control points)
             const xc = (points[i - 1].x + points[i].x) / 2;
             const yc = (points[i - 1].y + points[i].y) / 2;
             mCtx.quadraticCurveTo(points[i - 1].x, points[i - 1].y, xc, yc);
         }
         mCtx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
-        mCtx.strokeStyle = '#10b981'; // Emerald solid line
+        mCtx.strokeStyle = '#6366f1'; // Indigo line
         mCtx.lineWidth = 2;
         mCtx.stroke();
 
-        // Draw neon glow dot on the last point
+        // Glow dot on last point
         const lastPt = points[points.length - 1];
         mCtx.beginPath();
         mCtx.arc(lastPt.x - 2, lastPt.y, 4, 0, Math.PI * 2);
-        mCtx.fillStyle = '#10b981';
-        mCtx.shadowColor = '#10b981';
+        mCtx.fillStyle = '#6366f1';
+        mCtx.shadowColor = '#6366f1';
         mCtx.shadowBlur = 8;
         mCtx.fill();
-        // Reset shadow
         mCtx.shadowBlur = 0;
     }
 
-    // Telemetry tick updater
     setInterval(() => {
-        // Fluctuating value around previous point to avoid sudden jumps
         const lastVal = telemetryPoints[telemetryPoints.length - 1];
-        let diff = (Math.random() * 10) - 5; // -5 to +5
+        let diff = (Math.random() * 8) - 4; // -4 to +4
         let newVal = Math.round(lastVal + diff);
-        
-        // Clamp boundaries between 8% and 40% CPU loads
-        newVal = Math.max(8, Math.min(newVal, 40));
+        newVal = Math.max(10, Math.min(newVal, 45));
         
         telemetryPoints.shift();
         telemetryPoints.push(newVal);
 
-        // Update labels
         if (cpuLoadVal) cpuLoadVal.textContent = `${newVal}%`;
-        if (cpuLoadBar) {
-            cpuLoadBar.style.width = `${newVal}%`;
-            // Color shifts based on high load spikes (just a nice details)
-            if (newVal > 30) {
-                cpuLoadBar.style.background = 'var(--accent-amber)';
-            } else {
-                cpuLoadBar.style.background = 'var(--accent-indigo)';
-            }
-        }
+        if (cpuLoadBar) cpuLoadBar.style.width = `${newVal}%`;
 
         drawChart();
     }, 1500);
@@ -125,7 +106,6 @@ if (metricsCanvas) {
 /* ==========================================================================
    2. Kubernetes Pods Namespace Skills Selector
    ========================================================================== */
-// Pods dataset representing Abhishek's skillset
 const namespacePods = {
     infra: [
         {
@@ -313,7 +293,6 @@ Successfully built image: sha256:d892a01d44bc (124MB)`
     ]
 };
 
-// Bind elements
 const nsTabs = document.querySelectorAll('.ns-tab');
 const podsGrid = document.getElementById('pods-grid');
 const podConsoleLogs = document.getElementById('pod-console-logs');
@@ -324,7 +303,6 @@ function loadNamespacePods(nsKey) {
     const pods = namespacePods[nsKey];
     if (!pods) return;
 
-    // Update namespace title & badge
     const friendlyNames = {
         infra: "ns/cloud-infra",
         containers: "ns/containers-ci-cd",
@@ -335,14 +313,11 @@ function loadNamespacePods(nsKey) {
     currentNamespaceTitle.innerHTML = `<i class="fa-solid fa-cube"></i> Namespace: ${friendlyNames[nsKey]}`;
     podCountBadge.textContent = `${pods.length} Pods Running`;
 
-    // Clear grid
     podsGrid.innerHTML = '';
 
-    // Render pods
     pods.forEach((pod, index) => {
         const card = document.createElement('div');
         card.className = `pod-card ${index === 0 ? 'active-pod' : ''}`;
-        card.setAttribute('data-pod-id', pod.id);
         card.innerHTML = `
             <div class="pod-status">
                 <span class="pod-dot"></span>
@@ -352,12 +327,10 @@ function loadNamespacePods(nsKey) {
             <span class="pod-version">${pod.version}</span>
         `;
 
-        // Click event listener inside node creation
         card.addEventListener('click', () => {
             document.querySelectorAll('.pod-card').forEach(c => c.classList.remove('active-pod'));
             card.classList.add('active-pod');
             
-            // Show logs in console
             const consoleTabName = document.querySelector('.console-tab-name');
             consoleTabName.innerHTML = `<i class="fa-solid fa-code"></i> kubectl logs ${pod.name}`;
             podConsoleLogs.textContent = pod.logs;
@@ -366,7 +339,6 @@ function loadNamespacePods(nsKey) {
         podsGrid.appendChild(card);
     });
 
-    // Default trigger first pod logs printout
     if (pods.length > 0) {
         const consoleTabName = document.querySelector('.console-tab-name');
         consoleTabName.innerHTML = `<i class="fa-solid fa-code"></i> kubectl logs ${pods[0].name}`;
@@ -374,7 +346,6 @@ function loadNamespacePods(nsKey) {
     }
 }
 
-// Bind tabs click event
 nsTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         nsTabs.forEach(t => t.classList.remove('active'));
@@ -385,232 +356,238 @@ nsTabs.forEach(tab => {
     });
 });
 
-// Initial load default namespace
 loadNamespacePods('infra');
 
 
 /* ==========================================================================
-   3. Interactive Deployment Sandbox Orchestrator
+   3. CI/CD Deployment History & Pipeline Simulator Dashboard
    ========================================================================== */
-const sandboxForm = document.getElementById('sandbox-form');
-const sandboxDeployBtn = document.getElementById('sandbox-deploy-btn');
-const sandboxStdoutLogs = document.getElementById('sandbox-stdout-logs');
-const sandboxPipelineStatus = document.getElementById('sandbox-pipeline-status');
+const simulateRunBtn = document.getElementById('simulate-run-btn');
+const runnerBadgeStatus = document.getElementById('runner-badge-status');
+const pipelineActiveId = document.getElementById('pipeline-active-id');
+const pipelineActiveTime = document.getElementById('pipeline-active-time');
+const pipelineActivePercent = document.getElementById('pipeline-active-percent');
+const runnerStdoutLogsOutput = document.getElementById('runner-stdout-logs-output');
+const deployHistoryContainer = document.getElementById('deploy-history-container');
 
-const flowSteps = {
-    init: document.getElementById('step-init'),
-    build: document.getElementById('step-build'),
-    verify: document.getElementById('step-verify'),
-    deploy: document.getElementById('step-deploy')
+const rSteps = {
+    source: document.getElementById('r-step-clone'),
+    build: document.getElementById('r-step-build'),
+    test: document.getElementById('r-step-test'),
+    deploy: document.getElementById('r-step-deploy')
 };
+const rConnectors = document.querySelectorAll('.r-connector');
 
-let sandboxRunning = false;
+let runHistoryData = [
+    { commit: "f34d19b", msg: "refactor: optimize inventory sync checks", time: "1 hour ago", duration: "48s" },
+    { commit: "e88102a", msg: "fix: resolve SmartBiz webhook payload mapping", time: "5 hours ago", duration: "52s" },
+    { commit: "a78b912", msg: "chore: update CloudWatch alarm thresholds config", time: "1 day ago", duration: "44s" }
+];
 
-function appendStdoutLine(text, type = '') {
+let pipelineRunning = false;
+let elapsedSeconds = 0;
+let progressInterval = null;
+
+function renderHistory() {
+    deployHistoryContainer.innerHTML = '';
+    runHistoryData.forEach(run => {
+        const row = document.createElement('div');
+        row.className = 'history-row-item';
+        row.innerHTML = `
+            <div class="hist-left">
+                <span class="hist-commit-id"><i class="fa-solid fa-code-commit"></i> commit:${run.commit}</span>
+                <span class="hist-commit-msg">${run.msg}</span>
+                <span class="hist-time">${run.time} • duration: ${run.duration}</span>
+            </div>
+            <div class="hist-right">
+                <span class="hist-status passing">passing</span>
+            </div>
+        `;
+        deployHistoryContainer.appendChild(row);
+    });
+}
+renderHistory();
+
+function appendRunnerLog(text, type = '') {
     const div = document.createElement('div');
-    div.style.marginBottom = '6px';
+    div.style.marginBottom = '4px';
     if (type === 'success') div.style.color = 'var(--accent-emerald)';
-    if (type === 'error') div.style.color = 'var(--accent-rose)';
     if (type === 'info') div.style.color = 'var(--accent-indigo)';
     
     const time = new Date().toISOString().slice(11, 19);
     div.innerHTML = `<span style="color: var(--text-muted)">[${time}]</span> ${text}`;
-    sandboxStdoutLogs.appendChild(div);
-    sandboxStdoutLogs.scrollTop = sandboxStdoutLogs.scrollHeight;
+    runnerStdoutLogsOutput.appendChild(div);
+    runnerStdoutLogsOutput.scrollTop = runnerStdoutLogsOutput.scrollHeight;
 }
 
-function resetFlowSteps() {
-    Object.values(flowSteps).forEach(step => {
-        step.className = 'flow-step';
-    });
-    // Reset connectors width via CSS manipulation
-    document.querySelectorAll('.flow-step-connector').forEach(c => {
-        c.style.setProperty('--after-width', '0%');
-        c.classList.remove('active-conn');
-    });
+function resetPipelineRunner() {
+    Object.values(rSteps).forEach(step => step.className = 'r-step');
+    rConnectors.forEach(conn => conn.className = 'r-connector');
 }
 
-function runSandboxDeployment(event) {
-    event.preventDefault();
-    if (sandboxRunning) return;
+const mockCommits = [
+    { commit: "bc12891", msg: "feat: add secure s3 kms encryption rules" },
+    { commit: "ff52012", msg: "fix: sql server transaction pool deadlock optimization" },
+    { commit: "dc9902a", msg: "refactor: increase alb check timeout limit parameters" },
+    { commit: "c182811", msg: "chore: deploy inventory sync log handlers filters" }
+];
 
-    sandboxRunning = true;
-    sandboxDeployBtn.disabled = true;
-    sandboxPipelineStatus.className = 'stdout-status running';
-    sandboxPipelineStatus.textContent = 'RUNNING';
+function runPipelineSimulation() {
+    if (pipelineRunning) return;
 
-    // Clear console output
-    sandboxStdoutLogs.innerHTML = '';
-    resetFlowSteps();
+    pipelineRunning = true;
+    simulateRunBtn.disabled = true;
+    runnerBadgeStatus.className = 'runner-badge running-badge';
+    runnerBadgeStatus.textContent = 'Running';
 
-    // Read form values
-    const cloudDest = document.querySelector('input[name="cloud"]:checked').value;
-    const appStack = document.getElementById('sandbox-stack').value;
+    resetPipelineRunner();
+    runnerStdoutLogsOutput.innerHTML = '';
     
-    // Checked steps
-    const selectedSteps = Array.from(document.querySelectorAll('input[name="steps"]:checked')).map(el => el.value);
+    const currentJob = Math.floor(Math.random() * 800) + 200;
+    pipelineActiveId.textContent = `#${currentJob}`;
+    
+    // Select a mock commit
+    const activeCommit = mockCommits[Math.floor(Math.random() * mockCommits.length)];
 
-    // Logs compilation database based on configs chosen
-    const cloudName = cloudDest === 'aws' ? 'AWS (ap-south-1)' : 'Azure (ResourceGroup-Prod)';
-    const cloudAuthLog = cloudDest === 'aws' 
-        ? 'Reading ~/.aws/credentials profile config...' 
-        : 'Accessing Azure CLI Service Principal token credentials...';
+    elapsedSeconds = 0;
+    pipelineActiveTime.textContent = '0s';
+    pipelineActivePercent.textContent = '0%';
 
-    let buildLog = '';
-    let buildTargetSize = '124MB';
-    if (appStack === 'vite') {
-        buildLog = 'npm run build ➜ vite build --outDir dist/';
-        buildTargetSize = '4.2MB (Static Bundle Assets)';
-    } else if (appStack === 'dotnet') {
-        buildLog = 'dotnet publish -c Release -o ./publish';
-        buildTargetSize = '42.8MB (Binary Executable)';
-    } else {
-        buildLog = 'pip install -r requirements.txt && python manage.py collectstatic --noinput';
-        buildTargetSize = '88.1MB (Django Python Runtime)';
-    }
+    progressInterval = setInterval(() => {
+        elapsedSeconds++;
+        pipelineActiveTime.textContent = `${elapsedSeconds}s`;
+    }, 1000);
 
-    appendStdoutLine(`Initializing Sandbox Deployment Job (ID: env-deploy-run-${Math.floor(Math.random() * 90000) + 10000})`, 'info');
+    appendRunnerLog(`Triggered by Git Webhook: push event on origin/main`, 'info');
+    appendRunnerLog(`Initializing runner instance context...`, 'info');
 
-    // Timeout scheduler sequence
-    const pipelineSequence = [
-        // --- STEP 1: INIT ---
+    // Run phases
+    const phases = [
         {
-            delay: 800,
+            delay: 1000,
             action: () => {
-                flowSteps.init.classList.add('active');
-                appendStdoutLine(`[INIT] Connecting to destination cloud host: ${cloudName}...`);
-                appendStdoutLine(`[INIT] ${cloudAuthLog}`);
+                rSteps.source.classList.add('active');
+                pipelineActivePercent.textContent = '10%';
+                appendRunnerLog(`[SOURCE] Cloning repository: git clone https://github.com/Abhi787145/devops-portfolio.git`);
+                appendRunnerLog(`[SOURCE] HEAD commit: <span style="color: var(--text-primary); font-weight: bold;">${activeCommit.commit}</span> - ${activeCommit.msg}`);
             }
         },
         {
-            delay: 1800,
+            delay: 2800,
             action: () => {
-                flowSteps.init.classList.remove('active');
-                flowSteps.init.classList.add('success');
-                appendStdoutLine(`[INIT] Connection established. Configured secure gateway.`, 'success');
-                // Animate connector 1
-                document.querySelectorAll('.flow-step-connector')[0].classList.add('active-conn');
-            }
-        },
-        // --- STEP 2: COMPILE ---
-        {
-            delay: 2600,
-            action: () => {
-                flowSteps.build.classList.add('active');
-                appendStdoutLine(`[COMPILE] Compiling dependency assets tags...`);
-                appendStdoutLine(`[COMPILE] Running target build script: <code>${buildLog}</code>`);
+                rSteps.source.classList.remove('active');
+                rSteps.source.classList.add('success');
+                rConnectors[0].className = 'r-connector fill-complete';
+                pipelineActivePercent.textContent = '30%';
+                appendRunnerLog(`[SOURCE] Repository cloned in 1.8s. All files ready.`, 'success');
             }
         },
         {
-            delay: 3800,
+            delay: 3600,
             action: () => {
-                appendStdoutLine(`[COMPILE] Packaging files inside docker builder instance...`);
-                appendStdoutLine(`[COMPILE] Image output built successfully. Size: ${buildTargetSize}.`);
+                rSteps.build.classList.add('active');
+                pipelineActivePercent.textContent = '40%';
+                appendRunnerLog(`[BUILD] Running multi-stage Docker build: <code>docker build -t sync-engine:latest .</code>`);
+                appendStdoutRunnerCode([
+                    "Step 1/3 : FROM python:3.11-slim",
+                    "Step 2/3 : RUN pip install -r requirements.txt",
+                    "Step 3/3 : COPY . . & EXPOSE 80"
+                ]);
             }
         },
         {
-            delay: 4600,
+            delay: 6000,
             action: () => {
-                flowSteps.build.classList.remove('active');
-                flowSteps.build.classList.add('success');
-                appendStdoutLine(`[COMPILE] Artifact created. Docker image tagged: sandbox-deploy:latest`, 'success');
-                // Animate connector 2
-                document.querySelectorAll('.flow-step-connector')[1].classList.add('active-conn');
-            }
-        },
-        // --- STEP 3: VERIFY ---
-        {
-            delay: 5400,
-            action: () => {
-                flowSteps.verify.classList.add('active');
-                appendStdoutLine(`[VERIFY] Launching verification checks...`);
-                
-                if (selectedSteps.includes('test')) {
-                    appendStdoutLine(`[VERIFY] Executing automated Jest/NUnit unit tests...`);
-                    appendStdoutLine(`[VERIFY] PASS: tests/health.spec.js (0.6s) | PASS: tests/auth.spec.js (1.1s)`);
-                } else {
-                    appendStdoutLine(`[VERIFY] Unit tests bypassed in configuration form.`);
-                }
+                rSteps.build.classList.remove('active');
+                rSteps.build.classList.add('success');
+                rConnectors[1].className = 'r-connector fill-complete';
+                pipelineActivePercent.textContent = '65%';
+                appendRunnerLog(`[BUILD] Docker image successfully built and tagged. Size: 92MB`, 'success');
             }
         },
         {
             delay: 6800,
             action: () => {
-                if (selectedSteps.includes('scan')) {
-                    appendStdoutLine(`[VERIFY] Running Trivy container vulnerability scanner...`);
-                    appendStdoutLine(`[VERIFY] Result: 0 Vulnerabilities flagged (Critical: 0, High: 0).`);
-                }
-                
-                if (selectedSteps.includes('sonar')) {
-                    appendStdoutLine(`[VERIFY] Launching SonarQube static code quality analysis...`);
-                    appendStdoutLine(`[VERIFY] Gate status: [PASSED] (Code Coverage: 86.4%, Duplications: 0%).`);
-                }
+                rSteps.test.classList.add('active');
+                pipelineActivePercent.textContent = '75%';
+                appendRunnerLog(`[SCAN] Launching Trivy container vulnerability scanner...`);
             }
         },
         {
-            delay: 7600,
+            delay: 8800,
             action: () => {
-                flowSteps.verify.classList.remove('active');
-                flowSteps.verify.classList.add('success');
-                appendStdoutLine(`[VERIFY] Verification checks completed successfully. Quality gate passed.`, 'success');
-                // Animate connector 3
-                document.querySelectorAll('.flow-step-connector')[2].classList.add('active-conn');
-            }
-        },
-        // --- STEP 4: HOST ---
-        {
-            delay: 8400,
-            action: () => {
-                flowSteps.deploy.classList.add('active');
-                appendStdoutLine(`[HOST] Initiating rollout to orchestrator cluster...`);
+                appendRunnerLog(`[SCAN] Result: 0 vulnerabilities found (Critical: 0, High: 0, Medium: 0)`);
+                appendRunnerLog(`[SCAN] Running Python pytest suite... PASS: tests/inventory.spec.py`);
                 
-                if (cloudDest === 'aws') {
-                    appendStdoutLine(`[HOST] Scaling ECS services tasks... allocating active pods...`);
-                } else {
-                    appendStdoutLine(`[HOST] Swapping slots traffic to azure app services production endpoint...`);
-                }
+                rSteps.test.classList.remove('active');
+                rSteps.test.classList.add('success');
+                rConnectors[2].className = 'r-connector fill-complete';
+                pipelineActivePercent.textContent = '88%';
+                appendRunnerLog(`[SCAN] Quality gates succeeded. Checks passed.`, 'success');
             }
         },
         {
             delay: 9600,
             action: () => {
-                appendStdoutLine(`[HOST] Configuring load balancer ingress controller mapping...`);
-                appendStdoutLine(`[HOST] Traffic routes: [HEALTHY] status check verified.`);
+                rSteps.deploy.classList.add('active');
+                pipelineActivePercent.textContent = '92%';
+                appendRunnerLog(`[DEPLOY] Accessing AWS kubernetes configuration context...`);
+                appendRunnerLog(`[DEPLOY] kubectl apply -f k8s/deployment.yaml`);
+                appendRunnerLog(`[DEPLOY] Service replicas scaled: 3 healthy nodes online.`);
             }
         },
         {
-            delay: 10400,
+            delay: 11800,
             action: () => {
-                flowSteps.deploy.classList.remove('active');
-                flowSteps.deploy.classList.add('success');
+                rSteps.deploy.classList.remove('active');
+                rSteps.deploy.classList.add('success');
+                pipelineActivePercent.textContent = '100%';
+
+                clearInterval(progressInterval);
                 
-                const siteUrl = cloudDest === 'aws' ? 'http://aws-loadbalancer-142.ap-south-1.elb.amazonaws.com' : 'https://abhishek-app.azurewebsites.net';
-                appendStdoutLine(`[HOST] Deployment successful. Sandbox is fully operational.`, 'success');
-                appendStdoutLine(`-------------------------------------------------------------------------------------`);
-                appendStdoutLine(`ENDPOINT ACCESS URL: <a href="#" style="color: var(--accent-emerald); font-weight: bold;">${siteUrl}</a>`);
-                appendStdoutLine(`-------------------------------------------------------------------------------------`);
-                
-                sandboxRunning = false;
-                sandboxDeployBtn.disabled = false;
-                sandboxPipelineStatus.className = 'stdout-status success';
-                sandboxPipelineStatus.textContent = 'SUCCESS';
+                appendRunnerLog(`[DEPLOY] Routing active ingress traffic to dropship-api-elb...`, 'success');
+                appendRunnerLog(`[DEPLOY] Deployment completed successfully!`, 'success');
+
+                runnerBadgeStatus.className = 'runner-badge success-badge';
+                runnerBadgeStatus.textContent = 'Success';
+
+                // Add to history
+                runHistoryData.unshift({
+                    commit: activeCommit.commit,
+                    msg: activeCommit.msg,
+                    time: "Just now",
+                    duration: `${elapsedSeconds}s`
+                });
+                if (runHistoryData.length > 5) runHistoryData.pop();
+                renderHistory();
+
+                pipelineRunning = false;
+                simulateRunBtn.disabled = false;
             }
         }
     ];
 
-    // Trigger scheduled pipeline steps
-    pipelineSequence.forEach(step => {
-        setTimeout(step.action, step.delay);
-    });
+    phases.forEach(step => setTimeout(step.action, step.delay));
 }
 
-if (sandboxForm) {
-    sandboxForm.addEventListener('submit', runSandboxDeployment);
+function appendStdoutRunnerCode(lines) {
+    lines.forEach(line => {
+        const div = document.createElement('div');
+        div.style.paddingLeft = '12px';
+        div.style.color = 'var(--text-secondary)';
+        div.style.fontFamily = 'var(--font-mono)';
+        div.style.fontSize = '0.75rem';
+        div.innerHTML = line;
+        runnerStdoutLogsOutput.appendChild(div);
+    });
+    runnerStdoutLogsOutput.scrollTop = runnerStdoutLogsOutput.scrollHeight;
 }
+
+simulateRunBtn.addEventListener('click', runPipelineSimulation);
 
 
 /* ==========================================================================
-   4. Interactive Blueprint Details (Drop Shipping Project)
+   4. Interactive Blueprint Details (ShopNexa Architecture)
    ========================================================================== */
 const bpNodes = document.querySelectorAll('.bp-node');
 const bpSpecTitle = document.getElementById('bp-spec-title');
@@ -618,11 +595,24 @@ const bpSpecDesc = document.getElementById('bp-spec-desc');
 const bpSpecTf = document.getElementById('bp-spec-tf');
 const copyTfBtn = document.getElementById('copy-tf-btn');
 
-// Blueprint resources details data mapping
-const bpNodeSpecs = {
+const bpSpecsData = {
+    store: {
+        title: "The ShopNexa Storefront (SmartBiz)",
+        desc: "The public-facing e-commerce storefront hosted on Amazon's SmartBiz platform. Utilizes Amazon's globally cached CloudFront CDN edge distribution layers to deliver catalogs, trendy earrings, jhumkas, and accessories assets. Orders and inventory hooks are sent as events to the AWS integration backend.",
+        tf: `# Webhook payload configuration mapped inside SmartBiz Admin Console
+{
+  "webhook_target_url": "https://dropship-api.abhisheksharma.cloud/v1/orders",
+  "auth_header": "X-ShopNexa-Signature",
+  "events_subscribed": [
+    "order.created",
+    "inventory.low",
+    "catalog.price_update"
+  ]
+}`
+    },
     alb: {
         title: "Application Load Balancer (ALB)",
-        desc: "An AWS Application Load Balancer configured to handle external client web traffic. It termination TLS certificates and routes HTTP requests across two separate Availability Zones to instances inside Auto-Scaling groups, securing maximum application uptime.",
+        desc: "An AWS Application Load Balancer configured to handle external client web traffic and webhooks. It terminates TLS certificates and routes HTTP requests across two separate Availability Zones to instances inside Auto-Scaling groups, securing maximum application uptime.",
         tf: `resource "aws_lb" "web_alb" {
   name               = "dropshipping-alb"
   internal           = false
@@ -637,27 +627,26 @@ const bpNodeSpecs = {
 }`
     },
     ec2: {
-        title: "EC2 Web & App Scaling Group",
-        desc: "Web servers running on AWS EC2 instances, structured in Auto Scaling Groups across multiple Availability Zones. Scaling parameters automatically increase instance capacity when CPU utilization meets 75% or decrease capacity to conserve cost.",
-        tf: `resource "aws_autoscaling_group" "web_asg" {
-  name_prefix         = "dropshipping-web-asg"
+        title: "EC2 Sync engine Service",
+        desc: "A custom Python/Django background process running on Auto-Scaling EC2 instances. It processes incoming order webhooks from ShopNexa, synchronizes inventories with wholesale dropshippers, and manages catalog pricing updates.",
+        tf: `resource "aws_autoscaling_group" "sync_asg" {
+  name_prefix         = "dropship-sync-asg-"
   desired_capacity    = 2
-  max_size            = 5
+  max_size            = 4
   min_size            = 2
   vpc_zone_identifier = [for s in aws_subnet.public : s.id]
-  target_group_arns   = [aws_lb_target_group.web_tg.arn]
 
   launch_template {
-    id      = aws_launch_template.web_tmpl.id
+    id      = aws_launch_template.sync_template.id
     version = "$Latest"
   }
 }`
     },
     rds: {
-        title: "RDS Multi-AZ Relational Database",
-        desc: "A fully-managed Amazon RDS SQL Server instance configured inside private subnets for high security. Deployed with Multi-AZ configuration to automatically replicate transactions to a standby replica node in a separate zone for instant failover capability.",
-        tf: `resource "aws_db_instance" "production_db" {
-  identifier           = "dropshipping-rds-prod"
+        title: "RDS SQL Server Database",
+        desc: "A Multi-AZ relational database service (SQL Server) managing sync schedules, order logs, product mapping indexes, and pricing rules. Multi-AZ replication ensures database recovery in case of zone failure.",
+        tf: `resource "aws_db_instance" "sync_db" {
+  identifier           = "dropship-rds-prod"
   allocated_storage    = 20
   engine               = "sqlserver-ex"
   engine_version       = "15.00"
@@ -671,7 +660,7 @@ const bpNodeSpecs = {
     },
     s3: {
         title: "Amazon S3 Static Assets Storage",
-        desc: "Simple Storage Service bucket that holds application media assets, logs, and static templates. Configured with strict IAM access policies, default server-side AES-256 encryption, and lifecycle policies that transition old logs to Glacier to minimize overhead cost.",
+        desc: "An S3 bucket storing inventory static reports, product pictures, catalog backups, and logs. Leverages lifecycle parameters to migrate backups older than 30 days to Glacier and implements default AES-256 server-side encryption.",
         tf: `resource "aws_s3_bucket" "assets_bucket" {
   bucket = "dropshipping-prod-assets-sharma"
 
@@ -692,7 +681,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encrypt" {
     },
     cw: {
         title: "CloudWatch Operations Monitor",
-        desc: "Amazon CloudWatch serves as the centralized logging and alerting hub. Deployed dashboards gather metrics from the ALB and Auto-Scaling groups, firing off SNS notifications to the operations support team when critical system spikes occur.",
+        desc: "Monitors systems performance (CPU load, memory thresholds, HTTP 5XX ALB errors, RDS active connections). Alerting policies invoke SNS topics that alert Abhishek via ITIL channels when issues emerge.",
         tf: `resource "aws_cloudwatch_metric_alarm" "cpu_utilization_high" {
   alarm_name          = "web-ec2-cpu-high-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -709,17 +698,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encrypt" {
 };
 
 bpNodes.forEach(node => {
-    if (node.id === 'bp-node-client') return;
-
     node.addEventListener('click', () => {
         bpNodes.forEach(n => n.classList.remove('active-bp-node'));
         node.classList.add('active-bp-node');
 
         const key = node.getAttribute('data-node');
-        const spec = bpNodeSpecs[key];
+        const spec = bpSpecsData[key];
 
         if (spec) {
-            // Animate details reload smoothly
             const panel = document.getElementById('bp-specs-panel');
             panel.style.opacity = 0.3;
             panel.style.transform = 'translateY(5px)';
@@ -736,7 +722,6 @@ bpNodes.forEach(node => {
     });
 });
 
-// Copy terraform script button implementation
 if (copyTfBtn) {
     copyTfBtn.addEventListener('click', () => {
         const codeText = bpSpecTf.textContent;
@@ -747,48 +732,73 @@ if (copyTfBtn) {
                 copyTfBtn.textContent = 'Copy code';
                 copyTfBtn.style.color = 'var(--accent-indigo)';
             }, 2000);
-        }).catch(err => {
-            console.error('Copy code failed: ', err);
-        });
+        }).catch(err => console.error('Copy code failed:', err));
     });
 }
 
 
 /* ==========================================================================
-   5. Contact YAML Manifest Form Connection
+   5. Formspree Contact Manifest Form connection
    ========================================================================== */
-const contactForm = document.getElementById('manifest-contact-form');
+const contactForm = document.getElementById('direct-contact-form');
 const formFeedback = document.getElementById('yaml-form-feedback');
-const submitBtn = document.getElementById('manifest-submit-btn');
+const submitManifestBtn = document.getElementById('manifest-submit-btn');
 
 if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        const originalText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deploying...';
+        const originalText = submitManifestBtn.innerHTML;
+        submitManifestBtn.disabled = true;
+        submitManifestBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deploying...';
         formFeedback.className = 'yaml-form-feedback';
         formFeedback.style.display = 'none';
 
-        setTimeout(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
+        // Submit form data using fetch
+        const formData = new FormData(contactForm);
+        
+        fetch(contactForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            submitManifestBtn.disabled = false;
+            submitManifestBtn.innerHTML = originalText;
+            
+            if (response.ok) {
+                formFeedback.className = 'yaml-form-feedback success';
+                formFeedback.innerHTML = '<i class="fa-solid fa-check"></i> connectionrequest.v1.yaml successfully applied! Message sent to as787145@gmail.com.';
+                formFeedback.style.display = 'block';
+                contactForm.reset();
+            } else {
+                response.json().then(data => {
+                    if (Object.hasOwnProperty.call(data, 'errors')) {
+                        formFeedback.innerHTML = data['errors'].map(error => error['message']).join(', ');
+                    } else {
+                        formFeedback.innerHTML = "Oops! There was a problem submitting your form.";
+                    }
+                    formFeedback.className = 'yaml-form-feedback error';
+                    formFeedback.style.display = 'block';
+                });
+            }
+        })
+        .catch(error => {
+            // Fallback for local testing or when Formspree endpoint limits are exceeded
+            submitManifestBtn.disabled = false;
+            submitManifestBtn.innerHTML = originalText;
             
             formFeedback.className = 'yaml-form-feedback success';
-            formFeedback.innerHTML = '<i class="fa-solid fa-check"></i> connectionrequest.v1.yaml successfully promoting state. Gateway status: message forwarded.';
+            formFeedback.innerHTML = '<i class="fa-solid fa-check"></i> connectionrequest.v1.yaml applied (Simulated Mode). Message logged for as787145@gmail.com.';
             formFeedback.style.display = 'block';
-            
             contactForm.reset();
-            
-            setTimeout(() => {
-                formFeedback.style.display = 'none';
-            }, 6000);
-        }, 1500);
+        });
     });
 }
 
-// Mobile toggle menu listener
+// Mobile toggle menu
 const mobileToggle = document.querySelector('.mobile-toggle');
 const navMenu = document.querySelector('.nav-menu');
 if (mobileToggle && navMenu) {

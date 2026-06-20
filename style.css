@@ -7,9 +7,9 @@
     --font-mono: 'JetBrains Mono', monospace;
 
     /* Theme Palette */
-    --bg-darker: #05070f;
-    --bg-dark: #080c16;
-    --bg-card: rgba(13, 20, 35, 0.7);
+    --bg-darker: #04060b;
+    --bg-dark: #070a14;
+    --bg-card: rgba(11, 16, 30, 0.7);
     --border-color: rgba(99, 102, 241, 0.15);
     --border-glow: rgba(99, 102, 241, 0.35);
 
@@ -186,7 +186,7 @@ body {
     left: 0;
     width: 100%;
     height: var(--navbar-height);
-    background: rgba(5, 7, 15, 0.7);
+    background: rgba(4, 6, 11, 0.75);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(99, 102, 241, 0.08);
@@ -194,7 +194,7 @@ body {
     transition: all var(--transition-speed);
 }
 .navbar.scrolled {
-    background: rgba(5, 7, 15, 0.92);
+    background: rgba(4, 6, 11, 0.95);
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -241,7 +241,7 @@ body {
     color: var(--text-primary);
 }
 
-.manifest-btn-nav {
+.contact-btn-nav {
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 6px 14px;
@@ -249,7 +249,7 @@ body {
     color: var(--accent-indigo);
     transition: all var(--transition-speed);
 }
-.manifest-btn-nav:hover {
+.contact-btn-nav:hover {
     border-color: var(--accent-indigo);
     background: rgba(99, 102, 241, 0.15);
     box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
@@ -269,7 +269,7 @@ body {
    ========================================================================== */
 .dashboard-hero-grid {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-columns: 1.15fr 0.85fr;
     gap: 40px;
     align-items: center;
     min-height: 70vh;
@@ -327,9 +327,10 @@ body {
     color: var(--accent-indigo);
 }
 
-.version-badge {
-    background: rgba(255, 255, 255, 0.02);
-    color: var(--text-secondary);
+.duration-badge {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: var(--accent-amber);
 }
 
 .hero-name {
@@ -455,7 +456,7 @@ body {
 }
 
 .metric-card {
-    background: rgba(255, 255, 255, 0.01);
+    background: rgba(255, 255, 255, 0.015);
     border: 1px solid rgba(255, 255, 255, 0.03);
     border-radius: 8px;
     padding: 14px 16px;
@@ -508,8 +509,9 @@ body {
 .cluster-layout-card {
     display: grid;
     grid-template-columns: 240px 1fr;
-    min-height: 520px;
+    min-height: 460px;
     overflow: hidden;
+    margin-bottom: 32px;
 }
 
 .cluster-namespaces {
@@ -543,7 +545,7 @@ body {
     border-left: 2px solid transparent;
 }
 .ns-tab:hover {
-    background: rgba(255, 255, 255, 0.01);
+    background: rgba(255, 255, 255, 0.015);
     color: var(--text-primary);
 }
 .ns-tab.active {
@@ -647,7 +649,7 @@ body {
     color: var(--text-muted);
 }
 
-/* Console details */
+/* Console Details */
 .pod-console-logger {
     margin-top: auto;
     border-radius: 8px;
@@ -683,7 +685,7 @@ body {
 
 .console-output-area {
     padding: 18px 22px;
-    height: 150px;
+    height: 140px;
     overflow-y: auto;
     font-family: var(--font-mono);
     font-size: 0.8rem;
@@ -692,297 +694,232 @@ body {
     white-space: pre-wrap;
 }
 
-/* ==========================================================================
-   CI/CD Build Sandbox Section
-   ========================================================================== */
-.sandbox-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.3fr;
-    gap: 32px;
+/* Core Competencies Platform Grid Card */
+.platform-grid-card {
+    margin-top: 32px;
 }
-
-.sandbox-config-panel {
-    display: flex;
-    flex-direction: column;
+.platform-grid-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
 }
-
-.config-form {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.config-label {
+.platform-grid-header h4 {
     font-family: var(--font-heading);
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.platform-grid-header h4 i {
+    color: var(--accent-indigo);
+    margin-right: 10px;
 }
 
-/* Customized inputs */
-.radio-toggle-group {
+.platforms-flex {
     display: flex;
-    gap: 12px;
+    flex-direction: column;
+    padding: 24px;
+    gap: 20px;
 }
-.radio-toggle-group input[type="radio"] {
-    display: none;
-}
-.radio-toggle-group label {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.015);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+
+.platform-item {
+    display: grid;
+    grid-template-columns: 80px 200px 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 20px;
     border-radius: 8px;
-    padding: 12px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-family: var(--font-mono);
-    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.007);
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    transition: all var(--transition-speed);
+}
+.platform-item:hover {
+    border-color: rgba(99, 102, 241, 0.2);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.platform-logo-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background: rgba(99, 102, 241, 0.04);
+    border: 1px solid rgba(99, 102, 241, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    transition: all var(--transition-speed);
-}
-.radio-toggle-group label i {
-    font-size: 1rem;
-}
-.radio-toggle-group label:hover {
-    border-color: rgba(99, 102, 241, 0.25);
-    background: rgba(255, 255, 255, 0.03);
-}
-.radio-toggle-group input[type="radio"]:checked + label {
-    background: rgba(99, 102, 241, 0.04);
-    border-color: var(--accent-indigo);
-    color: var(--text-primary);
-    box-shadow: 0 0 12px rgba(99, 102, 241, 0.1);
 }
 
-.select-wrapper {
-    position: relative;
-    width: 100%;
+.svg-logo {
+    width: 38px;
+    height: 38px;
 }
-.select-wrapper select {
-    width: 100%;
-    background: #0b0f19;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 12px 16px;
-    outline: none;
-    color: var(--text-primary);
+
+.platform-item h5 {
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.platform-item p {
     font-size: 0.85rem;
-    font-family: var(--font-body);
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    transition: border-color var(--transition-speed);
-}
-.select-wrapper select:focus {
-    border-color: var(--accent-indigo);
-}
-.select-wrapper::after {
-    content: '\f107';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
-.checkbox-group {
+/* ==========================================================================
+   CI/CD Pipeline Monitor Dashboard Section
+   ========================================================================== */
+.pipelines-dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 0.65fr;
+    gap: 32px;
+}
+
+.pipelines-active-runner {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-}
-.check-container {
-    display: block;
-    position: relative;
-    padding-left: 32px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    user-select: none;
-    line-height: 20px;
-}
-.check-container input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
-.checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 20px;
-    width: 20px;
-    background-color: rgba(255, 255, 255, 0.015);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 4px;
-    transition: all var(--transition-speed);
-}
-.check-container:hover input ~ .checkmark {
-    border-color: rgba(99, 102, 241, 0.3);
-}
-.check-container input:checked ~ .checkmark {
-    background-color: rgba(99, 102, 241, 0.08);
-    border-color: var(--accent-indigo);
-}
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
-.check-container input:checked ~ .checkmark:after {
-    display: block;
-}
-.check-container .checkmark:after {
-    left: 6px;
-    top: 2px;
-    width: 5px;
-    height: 10px;
-    border: solid var(--accent-indigo);
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    padding: 0;
+    overflow: hidden;
 }
 
-.deploy-sandbox-btn {
-    background: linear-gradient(135deg, var(--accent-indigo) 0%, #474adb 100%);
-    color: #ffffff;
+.runner-badge {
     font-family: var(--font-mono);
-    font-weight: 700;
-    font-size: 0.85rem;
-    padding: 14px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
-    transition: all var(--transition-speed);
-    margin-top: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
 }
-.deploy-sandbox-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
-    filter: brightness(1.05);
-}
-.deploy-sandbox-btn:disabled {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-muted);
-    box-shadow: none;
-    cursor: not-allowed;
+.idle-badge { background: rgba(255, 255, 255, 0.04); color: var(--text-secondary); }
+.running-badge { background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); animation: flash 1.5s infinite; }
+.success-badge { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+
+@keyframes flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
 
-/* Pipeline Status Steps flow */
-.sandbox-visual-panel {
+.runner-stats-header {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(5, 7, 15, 0.2);
+}
+
+.stat-unit {
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    align-items: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.03);
+}
+.stat-unit:last-child {
+    border-right: none;
 }
 
-.sandbox-flow-steps {
+.unit-val {
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.unit-lbl {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* Horizontal Pipeline flow line */
+.runner-flow-line-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 16px 0 32px 0;
-    padding: 0 10px;
+    padding: 32px;
+    background: rgba(255, 255, 255, 0.005);
+    border-bottom: 1px solid var(--border-color);
 }
 
-.flow-step {
+.r-step {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 8px;
-    z-index: 10;
 }
 
-.step-num-icon {
-    width: 44px;
-    height: 44px;
+.r-icon {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--text-secondary);
     transition: all var(--transition-speed);
 }
 
-.step-name {
+.r-name {
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--text-secondary);
     transition: color var(--transition-speed);
 }
 
-.flow-step-connector {
+.r-connector {
     flex: 1;
     height: 2px;
     background: rgba(255, 255, 255, 0.04);
-    margin: 0 10px;
+    margin: 0 12px;
     position: relative;
-    transform: translateY(-11px);
+    transform: translateY(-12px);
 }
-.flow-step-connector::after {
-    content: '';
+.r-connector .r-fill {
     position: absolute;
     left: 0;
     top: 0;
     height: 100%;
     width: 0%;
     background-color: var(--accent-indigo);
-    transition: width 0.4s ease;
+    transition: width 0.3s ease;
 }
 
-/* Step States */
-.flow-step.active .step-num-icon {
+/* Pipeline States */
+.r-step.active .r-icon {
     color: var(--accent-indigo);
     border-color: var(--accent-indigo);
     background: rgba(99, 102, 241, 0.05);
-    box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
 }
-.flow-step.active .step-name {
+.r-step.active .r-name {
     color: var(--accent-indigo);
 }
 
-.flow-step.success .step-num-icon {
+.r-step.success .r-icon {
     color: var(--accent-emerald);
     border-color: var(--accent-emerald);
     background: rgba(16, 185, 129, 0.05);
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
 }
-.flow-step.success .step-name {
+.r-step.success .r-name {
     color: var(--accent-emerald);
 }
 
-/* Console output */
-.sandbox-stdout-console {
-    flex-grow: 1;
-    border-radius: 8px;
-    background: #04060b;
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+.r-connector.fill-complete .r-fill {
+    width: 100%;
+    background-color: var(--accent-emerald);
 }
 
-.stdout-header {
+/* Runner logs */
+.runner-stdout-logs {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background: #04060b;
+}
+
+.stdout-head-bar {
     background: #0a0e1a;
-    padding: 10px 18px;
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -992,29 +929,147 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.stdout-status {
+.stdout-btn {
+    cursor: pointer;
+    color: var(--accent-emerald);
     font-weight: bold;
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.04);
+    transition: color var(--transition-speed);
 }
-.stdout-status.running { background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); }
-.stdout-status.success { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+.stdout-btn:hover {
+    color: #34d399;
+}
 
-.stdout-body {
-    padding: 18px 22px;
+.stdout-console-body {
+    padding: 18px 24px;
     height: 180px;
     overflow-y: auto;
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: #cbd5e1;
     line-height: 1.5;
-    flex-grow: 1;
 }
+
+/* Deploy History List (Right side) */
+.pipelines-history-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.deploy-history-rows {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    max-height: 480px;
+}
+
+.history-row-item {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all var(--transition-speed);
+}
+.history-row-item:hover {
+    border-color: rgba(99, 102, 241, 0.15);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.hist-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.hist-commit-id {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent-indigo);
+    font-weight: bold;
+}
+
+.hist-commit-msg {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    margin-top: 2px;
+}
+
+.hist-time {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.hist-right {
+    text-align: right;
+}
+
+.hist-status {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+.hist-status.passing { background: rgba(16, 185, 129, 0.08); color: var(--accent-emerald); }
 
 /* ==========================================================================
    Project Architecture Blueprint Map Section
    ========================================================================== */
+.shopnexa-context-card {
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.sn-logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.sn-tag-orange {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #ff5f1f;
+    background: rgba(255, 95, 31, 0.08);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.sn-store-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.sn-link-btn {
+    font-size: 0.8rem;
+    color: var(--accent-indigo);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color var(--transition-speed);
+}
+.sn-link-btn:hover {
+    color: #818cf8;
+}
+
+.sn-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Blueprint canvas layout modification */
 .blueprint-layout-grid {
     display: grid;
     grid-template-columns: 1.3fr 0.7fr;
@@ -1025,7 +1080,7 @@ body {
     height: 520px;
     position: relative;
     overflow: hidden;
-    background: #04070e;
+    background: #04060c;
 }
 
 /* Blueprint grid overlays */
@@ -1037,8 +1092,8 @@ body {
     height: 100%;
     z-index: 1;
     background-image: 
-        linear-gradient(rgba(0, 242, 254, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 242, 254, 0.02) 1px, transparent 1px);
+        linear-gradient(rgba(99, 102, 241, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.02) 1px, transparent 1px);
     background-size: 20px 20px;
 }
 
@@ -1062,7 +1117,7 @@ body {
     position: absolute;
     top: -8px;
     left: 12px;
-    background: #04070e;
+    background: #04060c;
     padding: 0 6px;
     font-family: var(--font-mono);
     font-size: 0.6rem;
@@ -1072,7 +1127,7 @@ body {
 #bp-aws-cloud {
     top: 15px;
     bottom: 15px;
-    left: 18%;
+    left: 23%;
     right: 15px;
     border-color: rgba(245, 158, 11, 0.2);
 }
@@ -1106,7 +1161,7 @@ body {
     position: absolute;
     bottom: -8px;
     right: 12px;
-    background: #04070e;
+    background: #04060c;
     padding: 0 4px;
     font-family: var(--font-mono);
     font-size: 0.55rem;
@@ -1116,10 +1171,10 @@ body {
 /* Nodes */
 .bp-node {
     position: absolute;
-    width: 60px;
-    height: 60px;
+    width: 68px;
+    height: 68px;
     border-radius: 6px;
-    background: #090e1a;
+    background: #090d18;
     border: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
@@ -1128,11 +1183,17 @@ body {
     cursor: pointer;
     z-index: 10;
     transition: all 0.22s;
+    text-align: center;
+    padding: 4px;
 }
 .bp-node:hover, .bp-node.active-bp-node {
     border-color: var(--accent-indigo);
     box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
     transform: translateY(-2px);
+}
+#bp-node-store:hover, #bp-node-store.active-bp-node {
+    border-color: #ff5f1f;
+    box-shadow: 0 0 12px rgba(255, 95, 31, 0.25);
 }
 #bp-node-rds:hover, #bp-node-rds.active-bp-node {
     border-color: var(--accent-emerald);
@@ -1140,13 +1201,16 @@ body {
 }
 
 .bp-node-icon {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     color: var(--text-secondary);
     margin-bottom: 2px;
     transition: color 0.22s;
 }
 .bp-node:hover .bp-node-icon, .bp-node.active-bp-node .bp-node-icon {
     color: var(--accent-indigo);
+}
+#bp-node-store:hover .bp-node-icon, #bp-node-store.active-bp-node .bp-node-icon {
+    color: #ff5f1f;
 }
 #bp-node-rds:hover .bp-node-icon, #bp-node-rds.active-bp-node .bp-node-icon {
     color: var(--accent-emerald);
@@ -1156,15 +1220,26 @@ body {
     font-family: var(--font-mono);
     font-size: 0.55rem;
     color: var(--text-muted);
-    font-weight: 500;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 .bp-node:hover .bp-node-label, .bp-node.active-bp-node .bp-node-label {
     color: var(--text-primary);
 }
 
+.bp-node-badge-tag {
+    font-family: var(--font-mono);
+    font-size: 0.45rem;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-secondary);
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-top: 2px;
+}
+
 /* Absolute Positioning Coordinates */
-#bp-node-client { left: 4%; top: 41%; border-color: rgba(255, 255, 255, 0.12); }
-#bp-node-alb { left: 21%; top: 41%; }
+#bp-node-store { left: 4%; top: 41%; }
+#bp-node-alb { left: 24%; top: 41%; }
 #bp-subnet-public #bp-node-ec2 { left: 50%; top: 50%; transform: translate(-50%, -50%); position: absolute; }
 #bp-subnet-private #bp-node-rds { left: 50%; top: 50%; transform: translate(-50%, -50%); position: absolute; }
 #bp-node-s3 { right: 4%; top: 15%; border-color: rgba(245, 158, 11, 0.15); }
@@ -1574,7 +1649,7 @@ body {
     color: var(--accent-emerald);
 }
 
-/* YAML form */
+/* YAML Form */
 .yaml-manifest-form {
     display: flex;
     flex-direction: column;
@@ -1798,6 +1873,17 @@ body {
         grid-template-columns: 1fr;
         gap: 40px;
     }
+    
+    .platform-item {
+        grid-template-columns: 60px 1fr;
+        gap: 16px;
+    }
+    .platform-item h5 {
+        grid-column: 2;
+    }
+    .platform-item p {
+        grid-column: 1 / span 2;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1811,7 +1897,7 @@ body {
         top: var(--navbar-height);
         left: 0;
         width: 100%;
-        background: rgba(5, 7, 15, 0.96);
+        background: rgba(4, 6, 11, 0.96);
         backdrop-filter: blur(20px);
         flex-direction: column;
         padding: 30px 24px;
@@ -1849,15 +1935,15 @@ body {
         border-bottom-color: var(--accent-indigo);
     }
     
-    .sandbox-grid {
+    .pipelines-dashboard-grid {
         grid-template-columns: 1fr;
     }
-    .sandbox-flow-steps {
+    .runner-flow-line-bar {
         flex-direction: column;
         gap: 16px;
         align-items: center;
     }
-    .flow-step-connector {
+    .r-connector {
         transform: rotate(90deg);
         height: 24px;
         margin: 8px 0;
@@ -1872,8 +1958,8 @@ body {
         transform: scale(0.85);
         transform-origin: center center;
     }
-    #bp-node-client { display: none; }
-    #line-bp-client-alb { display: none; }
+    #bp-node-store { display: none; }
+    #line-bp-store-alb { display: none; }
     
     .contact-manifest-grid {
         grid-template-columns: 1fr;

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Abhishek Sharma - CloudOps Dashboard Portfolio. DevOps Engineer specializing in AWS, Azure, Terraform, Kubernetes, CI/CD, and Database Operations.">
-    <meta name="keywords" content="Abhishek Sharma, DevOps, CloudOps, Cloud, Terraform, Kubernetes, Docker, Azure, AWS, CI/CD, SQL Server">
-    <title>Abhishek Sharma | DevOps Engineer Console</title>
+    <meta name="description" content="Abhishek Sharma - CloudOps Dashboard Portfolio. DevOps & Cloud Infrastructure Specialist. Managing AWS, Azure, Kubernetes, and CI/CD pipelines.">
+    <meta name="keywords" content="Abhishek Sharma, DevOps, CloudOps, AWS, Azure, Kubernetes, Docker, Terraform, CI/CD, SQL Server">
+    <title>Abhishek Sharma | DevOps & Cloud Observability Console</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,23 +19,23 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <!-- Grid Overlay Background -->
+    <!-- Obsidian Grid Background -->
     <div class="grid-bg"></div>
 
     <!-- Navigation Header -->
     <header class="navbar">
         <div class="navbar-container">
             <a href="#" class="logo">
-                <span class="console-prefix">cloud-console:</span><span class="console-user">~asharma</span>
+                <span class="console-prefix">devops-console:</span><span class="console-user">~asharma</span>
             </a>
             <nav class="nav-menu">
-                <a href="#dashboard" class="nav-link active">Overview</a>
-                <a href="#cluster" class="nav-link">K8s Clusters</a>
-                <a href="#sandbox" class="nav-link">Build Sandbox</a>
-                <a href="#blueprint" class="nav-link">Blueprints</a>
+                <a href="#overview" class="nav-link active">Overview</a>
+                <a href="#infrastructure" class="nav-link">Cloud Infrastructure</a>
+                <a href="#pipelines" class="nav-link">Pipelines Monitor</a>
+                <a href="#projects" class="nav-link">Blueprints</a>
                 <a href="#experience" class="nav-link">Experience</a>
                 <a href="#credentials" class="nav-link">Credentials</a>
-                <a href="#manifest" class="nav-link manifest-btn-nav">Contact</a>
+                <a href="#contact" class="nav-link contact-btn-nav">Contact Gateway</a>
             </nav>
             <button class="mobile-toggle" aria-label="Toggle Menu">
                 <i class="fa-solid fa-bars-staggered"></i>
@@ -43,32 +43,33 @@
         </div>
     </header>
 
-    <!-- Main Content Container -->
+    <!-- Main Container -->
     <main class="console-body">
-        <!-- Hero/Overview Section -->
-        <section id="dashboard" class="dashboard-section container">
+        
+        <!-- Overview / Hero Section -->
+        <section id="overview" class="dashboard-section container">
             <div class="dashboard-hero-grid">
-                <!-- Left Details Column -->
+                <!-- Left Details -->
                 <div class="hero-left">
                     <div class="dashboard-meta-badges">
                         <span class="meta-badge system-healthy">
-                            <span class="pulse-dot"></span> Cluster: Healthy
+                            <span class="pulse-dot"></span> System Status: Online
                         </span>
                         <span class="meta-badge location-badge">
-                            <i class="fa-solid fa-earth-asia"></i> ap-south-1
+                            <i class="fa-solid fa-cloud"></i> AWS / Azure Hybrid
                         </span>
-                        <span class="meta-badge version-badge">
-                            <i class="fa-solid fa-code-branch"></i> v2.0.4
+                        <span class="meta-badge duration-badge">
+                            <i class="fa-solid fa-business-time"></i> 3+ Years Experience
                         </span>
                     </div>
                     <h1 class="hero-name">Abhishek Sharma</h1>
-                    <h2 class="hero-title">DevOps & Cloud Engineer</h2>
+                    <h2 class="hero-title">DevOps & Cloud Systems Engineer</h2>
                     <p class="hero-bio">
-                        Designing reliable high-availability infrastructure, automated release models, and proactive database maintenance. Expert in orchestrating AWS & Azure, containerized nodes, and infrastructure provisioning.
+                        Specializing in robust cloud provisioning, automated CI/CD releases, container orchestration, and high-availability database administration. Enabling companies to streamline SDLC models and scale infrastructure.
                     </p>
                     <div class="hero-action-buttons">
-                        <a href="#sandbox" class="btn btn-primary-console"><i class="fa-solid fa-terminal"></i> Launch Sandbox</a>
-                        <a href="#blueprint" class="btn btn-secondary-console"><i class="fa-solid fa-map"></i> View Blueprints</a>
+                        <a href="#pipelines" class="btn btn-primary-console"><i class="fa-solid fa-heart-pulse"></i> Monitor Pipelines</a>
+                        <a href="#projects" class="btn btn-secondary-console"><i class="fa-solid fa-map"></i> View Architecture</a>
                     </div>
                     <div class="hero-socials">
                         <a href="https://www.linkedin.com/in/as787145" target="_blank" rel="noopener noreferrer" class="social-icon" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
@@ -77,7 +78,7 @@
                     </div>
                 </div>
 
-                <!-- Right Live Metrics Dashboard Widget -->
+                <!-- Right Live Metrics Panel -->
                 <div class="metrics-dashboard glass-panel">
                     <div class="widget-header">
                         <span class="widget-title"><i class="fa-solid fa-chart-line"></i> live telemetry metrics</span>
@@ -85,24 +86,24 @@
                     </div>
                     <div class="metrics-grid">
                         <div class="metric-card">
-                            <span class="m-label">Cluster CPU Load</span>
-                            <span class="m-value" id="cpu-load-val">12%</span>
-                            <div class="m-bar"><div class="m-fill" id="cpu-load-bar" style="width: 12%"></div></div>
+                            <span class="m-label">Active Cluster Load</span>
+                            <span class="m-value" id="cpu-load-val">15%</span>
+                            <div class="m-bar"><div class="m-fill" id="cpu-load-bar" style="width: 15%"></div></div>
                         </div>
                         <div class="metric-card">
-                            <span class="m-label">Active Pods</span>
-                            <span class="m-value">36 / 36</span>
-                            <div class="m-bar"><div class="m-fill" style="width: 100%; background: var(--accent-emerald)"></div></div>
+                            <span class="m-label">Network Sync Latency</span>
+                            <span class="m-value">28ms</span>
+                            <div class="m-bar"><div class="m-fill" style="width: 28%; background: var(--accent-emerald)"></div></div>
                         </div>
                         <div class="metric-card">
-                            <span class="m-label">Deployments (YTD)</span>
-                            <span class="m-value">142</span>
-                            <div class="m-bar"><div class="m-fill" style="width: 85%; background: var(--accent-emerald)"></div></div>
+                            <span class="m-label">Automated Deployments</span>
+                            <span class="m-value">342 Runs</span>
+                            <div class="m-bar"><div class="m-fill" style="width: 90%; background: var(--accent-indigo)"></div></div>
                         </div>
                         <div class="metric-card">
-                            <span class="m-label">System Uptime</span>
-                            <span class="m-value">99.999%</span>
-                            <div class="m-bar"><div class="m-fill" style="width: 99.9%; background: var(--accent-emerald)"></div></div>
+                            <span class="m-label">Success Rate</span>
+                            <span class="m-value">99.8%</span>
+                            <div class="m-bar"><div class="m-fill" style="width: 99.8%; background: var(--accent-emerald)"></div></div>
                         </div>
                     </div>
                     <div class="metrics-graph-area">
@@ -112,16 +113,16 @@
             </div>
         </section>
 
-        <!-- Kubernetes Node/Skills Map Section -->
-        <section id="cluster" class="cluster-section container">
+        <!-- Cloud Infrastructure & Skills Section -->
+        <section id="infrastructure" class="cluster-section container">
             <div class="section-title-wrapper">
-                <span class="sec-label">k8s describe nodes</span>
-                <h3 class="sec-title">Cluster Skill Nodes</h3>
-                <p class="sec-desc">Navigate through active namespace scopes to view container pods and inspect raw integration logs.</p>
+                <span class="sec-label">resource manager</span>
+                <h3 class="sec-title">Cloud Infrastructure & Tech Stack</h3>
+                <p class="sec-desc">Explore the container namespaces containing my core DevOps tools, database skills, and platform competencies.</p>
             </div>
 
             <div class="cluster-layout-card glass-panel">
-                <!-- Tabs Sidebar/Selector -->
+                <!-- Namespaces selection sidebar -->
                 <div class="cluster-namespaces">
                     <div class="namespace-header">NAMESPACES</div>
                     <button class="ns-tab active" data-ns="infra">ns / cloud-infra</button>
@@ -131,29 +132,16 @@
                     <button class="ns-tab" data-ns="monitoring">ns / monitoring-ai</button>
                 </div>
 
-                <!-- Active Pods View Area -->
+                <!-- Active Pods Panel -->
                 <div class="pods-view-panel">
                     <div class="panel-header">
                         <span class="current-namespace-title"><i class="fa-solid fa-cube"></i> Namespace: ns/cloud-infra</span>
-                        <span class="pod-count-badge" id="pod-count">8 Pods Running</span>
+                        <span class="pod-count-badge" id="pod-count">4 Pods Running</span>
                     </div>
 
-                    <!-- Pod Grid (Will be populated/manipulated by JS) -->
+                    <!-- Pod Grid -->
                     <div class="pods-grid" id="pods-grid">
-                        <!-- Example Pod Card (infra) -->
-                        <div class="pod-card active-pod" data-pod="terraform" data-title="terraform-operator-pod" data-desc="Automating clouds using declarative IaC. Deployed 40+ resources for an AWS Drop Shipping e-commerce model, preventing configuration drift." data-logs='[INFO] initializing terraform workspace...
-[INFO] loading backend s3 configurations...
-[INFO] status: state locks validated.
-[INFO] parsing code resources...
-[INFO] 40+ AWS items mapped (EC2, RDS, VPC, S3, CloudWatch).
-[INFO] state file sync completed. 0 warnings.'>
-                            <div class="pod-status">
-                                <span class="pod-dot active"></span>
-                                <span class="pod-status-text">Running</span>
-                            </div>
-                            <h4 class="pod-name">pod/terraform-operator</h4>
-                            <span class="pod-version">v1.5.0</span>
-                        </div>
+                        <!-- Populated by JS -->
                     </div>
 
                     <!-- Pod Details Console Logger -->
@@ -163,176 +151,248 @@
                             <span class="console-timestamp">200 OK</span>
                         </div>
                         <div class="console-output-area" id="pod-console-logs">
-[INFO] initializing terraform workspace...
-[INFO] loading backend s3 configurations...
-[INFO] status: state locks validated.
-[INFO] parsing code resources...
-[INFO] 40+ AWS items mapped (EC2, RDS, VPC, S3, CloudWatch).
-[INFO] state file sync completed. 0 warnings.
+                            <!-- Logs output -->
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphical Platform Grid featuring SVG logos -->
+            <div class="platform-grid-card glass-panel">
+                <div class="platform-grid-header">
+                    <h4><i class="fa-solid fa-server"></i> Main Core Competency Platforms</h4>
+                </div>
+                <div class="platforms-flex">
+                    <!-- AWS Platform -->
+                    <div class="platform-item">
+                        <div class="platform-logo-wrapper">
+                            <!-- AWS SVG Logo -->
+                            <svg class="svg-logo" viewBox="0 0 100 100" fill="currentColor">
+                                <path fill="#FF9900" d="M47.7,13.6c-4.9-0.2-9.7,2.1-12.7,6.1c-1.3,1.7-2,3.8-2.1,6c-0.1,5.2,4,9.6,9.2,9.7c5.1,0.1,9.4-3.7,9.7-8.8c0.2-3.1-0.9-6.1-3.2-8.3C49.9,13.9,48.8,13.7,47.7,13.6z"/>
+                                <path fill="#232F3E" d="M84.2,56.8c0-10.4-8.8-14.7-22.3-15.8c-10.5-0.9-19.1,1.1-23.7,3.6c-1.3,0.7-2,2.2-1.7,3.6l1.9,8.4c0.3,1.2,1.3,2.1,2.5,2.1c2.8-1.5,8-3,13.6-2.5c8.3,0.7,11.3,3.3,11.3,7.4v1.8c-6,0.3-15,0.9-22.3,3.8c-7.9,3.1-13,9.5-13,17.4c0,9,7.1,14.6,17.3,14.6c8.5,0,15.2-4.1,18.7-9.5c0.8,3,3,5.4,5.9,6.5c1.4,0.5,2.9,0.5,4.3,0.1c1.2-0.4,2.2-1.2,2.7-2.3c1.7-3.7,2.1-11,2.1-17.7V56.8z M65,75c0,6.5-4,10.6-10.3,10.6c-5.1,0-8.2-2.9-8.2-7.5c0-5.8,4.6-8.3,11.8-9c4-0.4,5.8-0.6,6.7-0.7V75z"/>
+                                <path fill="#FF9900" d="M12,83c16.2,10.7,37,16.2,56.3,14.8c12.2-0.9,23.8-4.7,33.7-11.2c1.7-1.1,1.9-3.4,0.6-4.9c-0.8-0.9-2.1-1.3-3.2-0.9c-9.5,4.9-20.3,7.6-31.2,7.9c-17.1,0.5-35.4-3.8-49.8-13.4c-1.7-1.1-4-0.6-5.1,1.1C12,81,11.7,82.1,12,83L12,83z M97.7,80c-0.9-1.2-2.6-1.5-3.8-0.7c-0.7,0.5-1.1,1.2-1.3,2l-0.8,4c-0.3,1.3,0.6,2.5,1.9,2.8c0.2,0,0.4,0,0.6,0l4.5-0.9c1.3-0.3,2.2-1.4,2.1-2.7c-0.1-0.9-0.6-1.7-1.4-2.1L97.7,80z"/>
+                            </svg>
+                        </div>
+                        <h5>Amazon Web Services</h5>
+                        <p>VPC Networking, EC2 Compute clusters, RDS databases administration, ALB distribution, Lambda functions, IAM governance, and CloudWatch metrics.</p>
+                    </div>
+
+                    <!-- Azure Platform -->
+                    <div class="platform-item">
+                        <div class="platform-logo-wrapper">
+                            <!-- Azure SVG Logo -->
+                            <svg class="svg-logo" viewBox="0 0 100 100" fill="currentColor">
+                                <path fill="#0089D6" d="M13,67L35,22L53,42L22,81L13,67Z"/>
+                                <path fill="#00BCF2" d="M53,42L77,13L87,26L48,87L31,69L53,42Z"/>
+                            </svg>
+                        </div>
+                        <h5>Microsoft Azure</h5>
+                        <p>Virtual Machines deployment, Storage Accounts & Blob storage integration, App Services hosting plans, Key Vault credentials securing, SQL Database Elastic Pools.</p>
+                    </div>
+
+                    <!-- Kubernetes Platform -->
+                    <div class="platform-item">
+                        <div class="platform-logo-wrapper">
+                            <!-- Kubernetes SVG Logo -->
+                            <svg class="svg-logo" viewBox="0 0 100 100" fill="currentColor">
+                                <path fill="#326CE5" d="M50,9.2L85.3,22V63.6L50,91.8L14.7,63.6V22L50,9.2Z M50,17.4L21.8,27.7V59.4L50,81.9L78.2,59.4V27.7L50,17.4Z"/>
+                                <path fill="#326CE5" d="M50,30.3L64.1,44.4L50,58.5L35.9,44.4L50,30.3Z M50,36L41.6,44.4L50,52.8L58.4,44.4L50,36Z"/>
+                                <line x1="50" y1="9.2" x2="50" y2="30.3" stroke="#326CE5" stroke-width="4"/>
+                                <line x1="85.3" y1="22" x2="64.1" y2="44.4" stroke="#326CE5" stroke-width="4"/>
+                                <line x1="85.3" y1="63.6" x2="64.1" y2="44.4" stroke="#326CE5" stroke-width="4"/>
+                                <line x1="50" y1="91.8" x2="50" y2="58.5" stroke="#326CE5" stroke-width="4"/>
+                                <line x1="14.7" y1="63.6" x2="35.9" y2="44.4" stroke="#326CE5" stroke-width="4"/>
+                                <line x1="14.7" y1="22" x2="35.9" y2="44.4" stroke="#326CE5" stroke-width="4"/>
+                            </svg>
+                        </div>
+                        <h5>Kubernetes</h5>
+                        <p>Pod nodes scheduling, namespaces isolation, custom config maps, automated scaling deployments, and service endpoints load routing.</p>
+                    </div>
+
+                    <!-- Docker Platform -->
+                    <div class="platform-item">
+                        <div class="platform-logo-wrapper">
+                            <!-- Docker SVG Logo -->
+                            <svg class="svg-logo" viewBox="0 0 100 100" fill="currentColor">
+                                <path fill="#2496ED" d="M12.6,39.4L18.6,34.4H28.6L34.6,39.4L32.6,44.4H14.6L12.6,39.4Z"/>
+                                <path fill="#2496ED" d="M38.6,39.4L44.6,34.4H54.6L60.6,39.4L58.6,44.4H40.6L38.6,39.4Z"/>
+                                <path fill="#2496ED" d="M12.6,49.4L18.6,44.4H28.6L34.6,49.4L32.6,54.4H14.6L12.6,49.4Z"/>
+                                <path fill="#2496ED" d="M38.6,49.4L44.6,44.4H54.6L60.6,49.4L58.6,54.4H40.6L38.6,49.4Z"/>
+                                <path fill="#2496ED" d="M64.6,49.4L70.6,44.4H80.6L86.6,49.4L84.6,54.4H66.6L64.6,49.4Z"/>
+                                <path fill="#2496ED" d="M38.6,59.4L44.6,54.4H54.6L60.6,59.4L58.6,64.4H40.6L38.6,59.4Z"/>
+                                <path fill="#2496ED" d="M14.6,69.4L20.6,64.4H30.6L36.6,69.4L34.6,74.4H16.6L14.6,69.4Z"/>
+                                <path fill="#2496ED" d="M96.6,56.4c-4.4,0-12,3.8-17.5,7.7c-5.5,3.9-9.5,8.8-9.5,12.7c0,3,2,5.2,5.5,5.2c12,0,21.5-12.2,21.5-22.1c0-1.8,0-3.5,0-3.5Z"/>
+                                <path fill="#2496ED" d="M8,79.4c1.8-1.8,5.5-2.7,11.5-2.7c18,0,32,7.3,47,7.3c15,0,26.5-12,26.5-24c0-0.5,0-1,0-1.5c-3,4.4-8,7.3-15.5,7.3c-15.5,0-23.5-9.7-41-9.7c-17.5,0-28.5,12.7-28.5,23.3Z"/>
+                            </svg>
+                        </div>
+                        <h5>Docker Containers</h5>
+                        <p>Constructing multi-stage caching Dockerfiles, minimizing images layers sizes, setting secure users context execution, running local developer environments.</p>
+                    </div>
+
+                    <!-- Terraform Platform -->
+                    <div class="platform-item">
+                        <div class="platform-logo-wrapper">
+                            <!-- Terraform SVG Logo -->
+                            <svg class="svg-logo" viewBox="0 0 100 100" fill="currentColor">
+                                <path fill="#7B42BC" d="M22,12h24v24H22V12z"/>
+                                <path fill="#7B42BC" d="M54,12h24v24H54V12z"/>
+                                <path fill="#7B42BC" d="M22,44h24v24H22V44z"/>
+                                <path fill="#7B42BC" d="M54,44h24v24H54V44z"/>
+                                <path fill="#7B42BC" d="M22,76h24v24H22V76z"/>
+                            </svg>
+                        </div>
+                        <h5>Terraform IaC</h5>
+                        <p>Drafting modular, parameterizable infrastructure code. Managing remote states backend mappings, variables injection, and resource dependencies.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Interactive Sandbox Build CI/CD Section -->
-        <section id="sandbox" class="sandbox-section container">
+        <!-- CI/CD Pipelines Monitor & Deploy History Section -->
+        <section id="pipelines" class="pipelines-section container">
             <div class="section-title-wrapper">
-                <span class="sec-label">pipeline orchestrator</span>
-                <h3 class="sec-title">Interactive Deployment Sandbox</h3>
-                <p class="sec-desc">Customize deployment variables, trigger a live mock build execution, and monitor standard stdout outputs.</p>
+                <span class="sec-label">ci/cd build engine</span>
+                <h3 class="sec-title">Deployment Monitor Dashboard</h3>
+                <p class="sec-desc">Observe simulated git push actions, view active build execution traces, and scan past workflow run records.</p>
             </div>
 
-            <div class="sandbox-grid">
-                <!-- Left: Configuration Form Console -->
-                <div class="sandbox-config-panel glass-panel">
-                    <div class="panel-header-simple">
-                        <h4><i class="fa-solid fa-sliders"></i> Deployment Variables</h4>
+            <div class="pipelines-dashboard-grid">
+                <!-- Left: Live Runner Details -->
+                <div class="pipelines-active-runner glass-panel">
+                    <div class="widget-header">
+                        <span class="widget-title"><i class="fa-solid fa-play"></i> active runner status</span>
+                        <span class="runner-badge idle-badge" id="runner-badge-status">Idle</span>
                     </div>
-                    <form id="sandbox-form" class="config-form">
-                        <!-- Variable 1: Cloud Destination -->
-                        <div class="form-group">
-                            <label class="config-label">Target Cloud Destination</label>
-                            <div class="radio-toggle-group">
-                                <input type="radio" id="cloud-aws" name="cloud" value="aws" checked>
-                                <label for="cloud-aws"><i class="fa-brands fa-aws"></i> AWS Cloud</label>
-                                
-                                <input type="radio" id="cloud-azure" name="cloud" value="azure">
-                                <label for="cloud-azure"><i class="fa-brands fa-microsoft"></i> Azure Cloud</label>
-                            </div>
-                        </div>
 
-                        <!-- Variable 2: Service Stack -->
-                        <div class="form-group">
-                            <label class="config-label">Service/App Stack</label>
-                            <div class="select-wrapper">
-                                <select id="sandbox-stack" name="stack">
-                                    <option value="vite">Vite Web Static Application</option>
-                                    <option value="dotnet">.NET Core Backend API</option>
-                                    <option value="django">Python Django Framework Service</option>
-                                </select>
-                            </div>
+                    <div class="runner-stats-header">
+                        <div class="stat-unit">
+                            <span class="unit-val" id="pipeline-active-id">#--</span>
+                            <span class="unit-lbl">Job ID</span>
                         </div>
-
-                        <!-- Variable 3: Testing Suites -->
-                        <div class="form-group">
-                            <label class="config-label">Verification Pipeline Steps</label>
-                            <div class="checkbox-group">
-                                <label class="check-container">
-                                    <input type="checkbox" id="check-test" name="steps" value="test" checked>
-                                    <span class="checkmark"></span>
-                                    Run Unit Tests
-                                </label>
-                                <label class="check-container">
-                                    <input type="checkbox" id="check-scan" name="steps" value="scan" checked>
-                                    <span class="checkmark"></span>
-                                    Trivy Container Scan
-                                </label>
-                                <label class="check-container">
-                                    <input type="checkbox" id="check-sonar" name="steps" value="sonar">
-                                    <span class="checkmark"></span>
-                                    SonarQube Analysis
-                                </label>
-                            </div>
+                        <div class="stat-unit">
+                            <span class="unit-val" id="pipeline-active-time">0s</span>
+                            <span class="unit-lbl">Duration</span>
                         </div>
+                        <div class="stat-unit">
+                            <span class="unit-val" id="pipeline-active-percent">0%</span>
+                            <span class="unit-lbl">Completed</span>
+                        </div>
+                    </div>
 
-                        <!-- Action Button -->
-                        <button type="submit" class="deploy-sandbox-btn" id="sandbox-deploy-btn">
-                            <span class="btn-text-content"><i class="fa-solid fa-play"></i> kubectl apply -f sandbox-deploy.yaml</span>
-                        </button>
-                    </form>
+                    <!-- Flow representation -->
+                    <div class="runner-flow-line-bar">
+                        <div class="r-step" id="r-step-clone" title="1. Clone repository source">
+                            <div class="r-icon"><i class="fa-solid fa-code-branch"></i></div>
+                            <span class="r-name">Source</span>
+                        </div>
+                        <div class="r-connector"><div class="r-fill"></div></div>
+                        <div class="r-step" id="r-step-build" title="2. Compile docker container image">
+                            <div class="r-icon"><i class="fa-solid fa-cube"></i></div>
+                            <span class="r-name">Build</span>
+                        </div>
+                        <div class="r-connector"><div class="r-fill"></div></div>
+                        <div class="r-step" id="r-step-test" title="3. Execute unit scans & Trivy code security audits">
+                            <div class="r-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                            <span class="r-name">Scan</span>
+                        </div>
+                        <div class="r-connector"><div class="r-fill"></div></div>
+                        <div class="r-step" id="r-step-deploy" title="4. Scaling Kubernetes replicas nodes">
+                            <div class="r-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                            <span class="r-name">Deploy</span>
+                        </div>
+                    </div>
+
+                    <!-- Console logs output -->
+                    <div class="runner-stdout-logs">
+                        <div class="stdout-head-bar">
+                            <span>RUNNER TERMINAL STDOUT</span>
+                            <span class="stdout-btn" id="simulate-run-btn"><i class="fa-solid fa-circle-play"></i> Trigger Pipeline Run</span>
+                        </div>
+                        <div class="stdout-console-body" id="runner-stdout-logs-output">
+[SYSTEM] Runner console initialized. Click 'Trigger Pipeline Run' to start a build simulation.
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Right: Running Pipeline Visualizer & Console stdout -->
-                <div class="sandbox-visual-panel glass-panel">
-                    <div class="panel-header-simple">
-                        <h4><i class="fa-solid fa-network-wired"></i> Deployment Pipeline Status</h4>
+                <!-- Right: Deployment History Rows -->
+                <div class="pipelines-history-list glass-panel">
+                    <div class="widget-header">
+                        <span class="widget-title"><i class="fa-solid fa-clock-rotate-left"></i> workflow run history</span>
+                        <span class="widget-status">showing last 5 runs</span>
                     </div>
 
-                    <!-- Steps flow indicator -->
-                    <div class="sandbox-flow-steps">
-                        <div class="flow-step" id="step-init">
-                            <div class="step-num-icon"><i class="fa-solid fa-gears"></i></div>
-                            <span class="step-name">1. Init</span>
-                        </div>
-                        <div class="flow-step-connector"></div>
-                        
-                        <div class="flow-step" id="step-build">
-                            <div class="step-num-icon"><i class="fa-solid fa-hammer"></i></div>
-                            <span class="step-name">2. Compile</span>
-                        </div>
-                        <div class="flow-step-connector"></div>
-                        
-                        <div class="flow-step" id="step-verify">
-                            <div class="step-num-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                            <span class="step-name">3. Verify</span>
-                        </div>
-                        <div class="flow-step-connector"></div>
-                        
-                        <div class="flow-step" id="step-deploy">
-                            <div class="step-num-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                            <span class="step-name">4. Host</span>
-                        </div>
-                    </div>
-
-                    <!-- Stdout output area -->
-                    <div class="sandbox-stdout-console">
-                        <div class="stdout-header">
-                            <span><i class="fa-solid fa-terminal"></i> Deployment Runner Stdout Logs</span>
-                            <span class="stdout-status" id="sandbox-pipeline-status">IDLE</span>
-                        </div>
-                        <div class="stdout-body" id="sandbox-stdout-logs">
-[SYSTEM] Sandbox console idle. Choose configs on the left and trigger run task.
-                        </div>
+                    <div class="deploy-history-rows" id="deploy-history-container">
+                        <!-- History items populated dynamically by JS -->
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Project Blueprint Section -->
-        <section id="blueprint" class="blueprint-section container">
+        <!-- Projects & Architectural Blueprints Section -->
+        <section id="projects" class="projects-section container">
             <div class="section-title-wrapper">
-                <span class="sec-label">infrastructure diagram blueprint</span>
-                <h3 class="sec-title">Drop Shipping Architecture</h3>
-                <p class="sec-desc">Click blueprint nodes to load component specifications and corresponding Terraform IaC configuration code.</p>
+                <span class="sec-label">system architecture blueprint</span>
+                <h3 class="sec-title">Drop Shipping Integration Blueprint</h3>
+                <p class="sec-desc">Explore the exact architecture of <strong>ShopNexa</strong>. Click blueprint nodes to load resources details and Terraform IaC code.</p>
+            </div>
+
+            <!-- ShopNexa Context Panel -->
+            <div class="shopnexa-context-card glass-panel">
+                <div class="sn-logo-wrapper">
+                    <span class="sn-tag-orange">E-COMMERCE SYSTEM</span>
+                    <h4 class="sn-store-title">The ShopNexa Project</h4>
+                    <a href="https://theshopnexa.smartbiz.in/all-products" target="_blank" rel="noopener noreferrer" class="sn-link-btn">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Running Storefront
+                    </a>
+                </div>
+                <p class="sn-description">
+                    <strong>ShopNexa</strong> is a live, running drop shipping jewelry storefront (trendy earrings, jhumkas, and accessories) hosted on **Amazon SmartBiz** cloud infrastructure. Abhishek designed and automated the custom **AWS Dropshipping Synchronization Backend**. This synchronizer handles inventory checks, updates prices dynamically via store APIs, processes wholesale order events, and tracks catalog updates.
+                </p>
             </div>
 
             <div class="blueprint-layout-grid">
-                <!-- Blueprint Blueprint Visual Map -->
+                <!-- Interactive Canvas Diagram -->
                 <div class="blueprint-canvas-card glass-panel">
                     <div class="blueprint-grid-overlay"></div>
                     <div class="blueprint-wrapper">
-                        <!-- Cloud boundary -->
+                        <!-- SmartBiz Storefront Node (Outside AWS Custom Environment) -->
+                        <div class="bp-node active-bp-node" id="bp-node-store" data-node="store">
+                            <div class="bp-node-icon"><i class="fa-solid fa-store"></i></div>
+                            <span class="bp-node-label">ShopNexa Store</span>
+                            <span class="bp-node-badge-tag">SmartBiz CDN</span>
+                        </div>
+
+                        <!-- AWS Cloud boundaries -->
                         <div class="bp-boundary" id="bp-aws-cloud">
-                            <span class="bp-boundary-label">AWS CLOUD CONTAINER REGION</span>
+                            <span class="bp-boundary-label">AWS Custom Infrastructure (ap-south-1)</span>
 
                             <!-- VPC border -->
                             <div class="bp-boundary" id="bp-vpc">
                                 <span class="bp-boundary-label">VPC (CIDR: 10.0.0.0/16)</span>
 
                                 <!-- Load balancer -->
-                                <div class="bp-node active-bp-node" id="bp-node-alb" data-node="alb">
+                                <div class="bp-node" id="bp-node-alb" data-node="alb">
                                     <div class="bp-node-icon"><i class="fa-solid fa-shuffle"></i></div>
-                                    <span class="bp-node-label">ALB (LoadBalancer)</span>
+                                    <span class="bp-node-label">ALB (Router)</span>
                                 </div>
 
-                                <!-- Public Subnet -->
+                                <!-- Public Subnet (EC2 Sync engine) -->
                                 <div class="bp-subnet" id="bp-subnet-public">
-                                    <span class="bp-subnet-label">PUBLIC SUBNET (AZ-A / AZ-B)</span>
+                                    <span class="bp-subnet-label">PUBLIC SUBNET (Auto-Scaling)</span>
                                     
                                     <div class="bp-node" id="bp-node-ec2" data-node="ec2">
-                                        <div class="bp-node-icon"><i class="fa-solid fa-server"></i></div>
-                                        <span class="bp-node-label">EC2 Scaling Web Group</span>
+                                        <div class="bp-node-icon"><i class="fa-solid fa-gears"></i></div>
+                                        <span class="bp-node-label">Sync Server</span>
                                     </div>
                                 </div>
 
-                                <!-- Private Subnet -->
+                                <!-- Private Subnet (RDS Database) -->
                                 <div class="bp-subnet" id="bp-subnet-private">
-                                    <span class="bp-subnet-label">PRIVATE DATABASE SUBNET (Multi-AZ)</span>
+                                    <span class="bp-subnet-label">PRIVATE DATABASE SUBNET</span>
                                     
                                     <div class="bp-node" id="bp-node-rds" data-node="rds">
                                         <div class="bp-node-icon"><i class="fa-solid fa-database"></i></div>
-                                        <span class="bp-node-label">RDS SQL Master</span>
+                                        <span class="bp-node-label">RDS SQL Server</span>
                                     </div>
                                 </div>
                             </div>
@@ -340,7 +400,7 @@
                             <!-- Storage S3 -->
                             <div class="bp-node" id="bp-node-s3" data-node="s3">
                                 <div class="bp-node-icon"><i class="fa-solid fa-box-archive"></i></div>
-                                <span class="bp-node-label">S3 Assets Storage</span>
+                                <span class="bp-node-label">S3 Sync Storage</span>
                             </div>
 
                             <!-- CloudWatch monitoring -->
@@ -350,21 +410,15 @@
                             </div>
                         </div>
 
-                        <!-- Web Traffic Client Source -->
-                        <div class="bp-node" id="bp-node-client">
-                            <div class="bp-node-icon"><i class="fa-solid fa-laptop-code"></i></div>
-                            <span class="bp-node-label">Client HTTPS</span>
-                        </div>
-
                         <!-- Connectivity SVG Lines -->
                         <svg class="bp-lines">
-                            <!-- client to alb -->
-                            <line class="bp-pulse-line" x1="5%" y1="50%" x2="21%" y2="50%" id="line-bp-client-alb"></line>
+                            <!-- store -> alb (webhook push) -->
+                            <line class="bp-pulse-line" x1="12%" y1="50%" x2="25%" y2="50%" id="line-bp-store-alb"></line>
                             <!-- alb to ec2 -->
-                            <line class="bp-pulse-line" x1="28%" y1="50%" x2="43%" y2="35%" id="line-bp-alb-ec2"></line>
+                            <line class="bp-pulse-line" x1="31%" y1="50%" x2="44%" y2="35%" id="line-bp-alb-ec2"></line>
                             <!-- ec2 to rds -->
                             <line class="bp-pulse-line" x1="51%" y1="35%" x2="68%" y2="52%" id="line-bp-ec2-rds"></line>
-                            <!-- ec2 to s3 -->
+                            <!-- ec2 to s3 (assets write) -->
                             <line class="bp-line" x1="51%" y1="31%" x2="81%" y2="20%" id="line-bp-ec2-s3"></line>
                             <!-- monitoring lines -->
                             <line class="bp-line bp-dash-line" x1="81%" y1="80%" x2="51%" y2="35%" id="line-bp-cw-ec2"></line>
@@ -372,27 +426,26 @@
                     </div>
                 </div>
 
-                <!-- Right: Details Specification Panel -->
+                <!-- Right: Resource details Specification Panel -->
                 <div class="blueprint-specs-panel glass-panel" id="bp-specs-panel">
                     <div class="panel-header-simple">
                         <h4><i class="fa-solid fa-clipboard-list"></i> Resource Deployment Specification</h4>
                     </div>
                     <div class="specs-content">
-                        <h4 class="specs-node-title" id="bp-spec-title">Application Load Balancer (ALB)</h4>
-                        <p class="specs-node-desc" id="bp-spec-desc">An AWS Application Load Balancer configured to handle external client web traffic. It termination TLS certificates and routes HTTP requests across two separate Availability Zones to instances inside Auto-Scaling groups, securing maximum application uptime.</p>
+                        <h4 class="specs-node-title" id="bp-spec-title">The ShopNexa E-Commerce Storefront</h4>
+                        <p class="specs-node-desc" id="bp-spec-desc">The buyer-facing storefront hosted on Amazon's SmartBiz platform. Utilizes Amazon's globally distributed CloudFront CDN cache edge layers to load product catalogs and trendy jewelry assets instantly.</p>
                         
                         <!-- Terraform Preview block -->
                         <div class="specs-terraform-block">
                             <div class="tf-block-header">
-                                <span><i class="fa-solid fa-code"></i> terraform configuration</span>
+                                <span><i class="fa-solid fa-code"></i> integrations & documentation</span>
                                 <span class="tf-copy-btn" id="copy-tf-btn">Copy code</span>
                             </div>
-                            <pre><code class="tf-code-font" id="bp-spec-tf">resource "aws_lb" "web_alb" {
-  name               = "dropshipping-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = [for s in aws_subnet.public : s.id]
+                            <pre><code class="tf-code-font" id="bp-spec-tf"># API Webhook destination registry in SmartBiz Console
+{
+  "webhook_url": "https://dropship-api.abhisheksharma.cloud/v1/orders",
+  "events": ["order.created", "product.update"],
+  "security_token": var.smartbiz_secret_token
 }</code></pre>
                         </div>
                     </div>
@@ -400,7 +453,7 @@
             </div>
         </section>
 
-        <!-- Professional Experience Section -->
+        <!-- Professional Experience Timeline -->
         <section id="experience" class="experience-section container">
             <div class="section-title-wrapper">
                 <span class="sec-label">system telemetry history</span>
@@ -434,7 +487,7 @@
                         </li>
                         <li>
                             <div class="item-icon-indicator"><i class="fa-solid fa-caret-right"></i></div>
-                            <p>Administered production SQL Server databases, creating backups, generating bacpac exports, and executing scripts using <strong>SSMS</strong>, PGAdmin, and MongoDB Compass.</p>
+                            <p>Administered production SQL Server databases, creating backups, generating database bacpac exports, and executing scripts using <strong>SSMS</strong>, PGAdmin, and MongoDB Compass.</p>
                         </li>
                         <li>
                             <div class="item-icon-indicator"><i class="fa-solid fa-caret-right"></i></div>
@@ -453,13 +506,13 @@
             </div>
         </section>
 
-        <!-- Credentials Section (Certifications & Education) -->
+        <!-- Credentials & Certifications -->
         <section id="credentials" class="credentials-section container">
             <div class="grid-two-cols">
                 <!-- Certifications Column -->
                 <div class="certifications-column">
                     <div class="section-title-wrapper-left">
-                        <span class="sec-label">badges validation</span>
+                        <span class="sec-label">validation badges</span>
                         <h3 class="sec-title-small">Certifications</h3>
                     </div>
                     <div class="certifications-deck">
@@ -538,17 +591,17 @@
         </section>
 
         <!-- Contact Section -->
-        <section id="manifest" class="contact-manifest-section container">
+        <section id="contact" class="contact-manifest-section container">
             <div class="section-title-wrapper">
                 <span class="sec-label">connection gateway</span>
-                <h3 class="sec-title">Deploy Connection Manifest</h3>
-                <p class="sec-desc">Submit your communication request as a YAML manifest. The API endpoint will apply the deployment parameters.</p>
+                <h3 class="sec-title">Deploy Connection request</h3>
+                <p class="sec-desc">Submit your message directly to my inbox. No login required. Powered by secure Formspree endpoint API.</p>
             </div>
 
             <div class="contact-manifest-grid">
-                <!-- Left: Static endpoints details -->
+                <!-- Left Details -->
                 <div class="manifest-details-card glass-panel">
-                    <h4>Operational Endpoints</h4>
+                    <h4>Direct Endpoints</h4>
                     <p class="specs-node-desc">Contact channels available for connection requests, scheduling calls, or remote collaborations.</p>
                     
                     <div class="static-endpoints-list">
@@ -577,12 +630,12 @@
 
                     <div class="ssl-compliance-badge">
                         <i class="fa-solid fa-shield-halved"></i>
-                        <span>Secure SSL TLS v1.3 handshake enabled. Spam traffic blocked.</span>
+                        <span>Secure SSL TLS v1.3 handshake enabled. Spam traffic filtered.</span>
                     </div>
                 </div>
 
-                <!-- Right: YAML Configuration contact form -->
-                <form class="yaml-manifest-form glass-panel" id="manifest-contact-form">
+                <!-- Right contact form -->
+                <form class="yaml-manifest-form glass-panel" id="direct-contact-form" action="https://formspree.io/f/mqakvljg" method="POST">
                     <div class="form-yaml-header">
                         <div class="yaml-header-controls">
                             <span class="ctrl red"></span>
@@ -597,17 +650,17 @@
                         <div class="yaml-row-line"><span class="y-lbl">apiVersion</span>: <span class="y-v">networking.k8s.io/v1</span></div>
                         <div class="yaml-row-line"><span class="y-lbl">kind</span>: <span class="y-v">ConnectionRequest</span></div>
                         <div class="yaml-row-line"><span class="y-lbl">metadata</span>:</div>
-                        <div class="yaml-row-line indent-tab"><span class="y-lbl">name</span>: <input type="text" id="m-name" required placeholder='"your name"' class="yaml-inline-input"></div>
-                        <div class="yaml-row-line indent-tab"><span class="y-lbl">email</span>: <input type="email" id="m-email" required placeholder='"your-email@domain.com"' class="yaml-inline-input"></div>
+                        <div class="yaml-row-line indent-tab"><span class="y-lbl">name</span>: <input type="text" name="name" required placeholder='"your name"' class="yaml-inline-input"></div>
+                        <div class="yaml-row-line indent-tab"><span class="y-lbl">email</span>: <input type="email" name="_replyto" required placeholder='"your-email@domain.com"' class="yaml-inline-input"></div>
                         <div class="yaml-row-line"><span class="y-lbl">spec</span>:</div>
-                        <div class="yaml-row-line indent-tab"><span class="y-lbl">subject</span>: <input type="text" id="m-subject" required placeholder='"collaboration / recruitment"' class="yaml-inline-input"></div>
+                        <div class="yaml-row-line indent-tab"><span class="y-lbl">subject</span>: <input type="text" name="_subject" required placeholder='"collaboration / recruitment"' class="yaml-inline-input"></div>
                         <div class="yaml-row-line indent-tab"><span class="y-lbl">message</span>: |</div>
-                        <div class="yaml-row-line indent-tab-double"><textarea id="m-message" required placeholder="Write your message details here..." class="yaml-inline-textarea"></textarea></div>
+                        <div class="yaml-row-line indent-tab-double"><textarea name="message" required placeholder="Write your message details here... Message will be delivered straight to my email." class="yaml-inline-textarea"></textarea></div>
                     </div>
                     
                     <div class="yaml-form-actions">
                         <button type="submit" class="yaml-submit-btn" id="manifest-submit-btn">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> kubectl apply -f deploy-connection.yaml
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Send Message (kubectl apply)
                         </button>
                     </div>
                     <div class="yaml-form-feedback" id="yaml-form-feedback"></div>
@@ -619,7 +672,7 @@
     <!-- Footer -->
     <footer class="console-footer">
         <div class="footer-content">
-            <p>&copy; 2026 Abhishek Sharma. Dashboard designed with raw HTML, CSS and JS.</p>
+            <p>&copy; 2026 Abhishek Sharma. Dashboard built with raw HTML, CSS and JS.</p>
             <div class="footer-stats-badges">
                 <span class="f-badge"><i class="fa-solid fa-circle"></i> nodes: active</span>
                 <span class="f-badge"><i class="fa-solid fa-shield"></i> security: passing</span>
