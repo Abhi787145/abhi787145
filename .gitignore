@@ -29,3 +29,6 @@ build/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Ignored Local LFS pointers
+public/models/character.glb

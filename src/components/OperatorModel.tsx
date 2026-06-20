@@ -80,7 +80,7 @@ const OperatorModel = () => {
 
     // Load Environment Map
     new RGBELoader()
-      .setPath("/models/")
+      .setPath(import.meta.env.BASE_URL + "models/")
       .load("char_enviorment.hdr", (texture) => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
         scene.environment = texture;
@@ -90,7 +90,7 @@ const OperatorModel = () => {
     // GLTF / Draco Loader
     const loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath("/draco/");
+    dracoLoader.setDecoderPath(import.meta.env.BASE_URL + "draco/");
     loader.setDRACOLoader(dracoLoader);
 
     let mixer: THREE.AnimationMixer | null = null;
@@ -111,7 +111,7 @@ const OperatorModel = () => {
     const loadModel = async () => {
       try {
         const decryptedBuffer = await decryptFile(
-          "/models/character.enc?v=2",
+          import.meta.env.BASE_URL + "models/character.enc?v=2",
           "MyCharacter12"
         );
         const blobUrl = URL.createObjectURL(new Blob([decryptedBuffer]));
