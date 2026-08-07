@@ -34,6 +34,40 @@ const PREDEFINED_COLORS = [
 ];
 
 const Admin = ({ config, setConfig }: AdminProps) => {
+  const [isAuthorized, setIsAuthorized] = useState(() => {
+    return sessionStorage.getItem('admin_authenticated') === 'true';
+  });
+  const [passcode, setPasscode] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  const sha256 = async (message: string) => {
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    setIsAuthenticating(true);
+
+    try {
+      const hashed = await sha256(passcode);
+      if (hashed === '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9') {
+        sessionStorage.setItem('admin_authenticated', 'true');
+        setIsAuthorized(true);
+      } else {
+        setLoginError('Access Denied: Invalid Decryption Key');
+      }
+    } catch (err) {
+      setLoginError('Authentication engine error. Please try again.');
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
   const [activeTab, setActiveTab] = useState<'profile' | 'skills' | 'projects' | 'experience'>('profile');
   const [localConfig, setLocalConfig] = useState(JSON.parse(JSON.stringify(config)));
   const [statusMessage, setStatusMessage] = useState<{ text: string; type: 'success' | 'error' | '' }>({ text: '', type: '' });
@@ -42,6 +76,50 @@ const Admin = ({ config, setConfig }: AdminProps) => {
     setStatusMessage({ text, type });
     setTimeout(() => setStatusMessage({ text: '', type: '' }), 4000);
   };
+
+  if (!isAuthorized) {
+    return (
+      <div className="admin-login-container">
+        <div className="grid-bg"></div>
+        <div className="login-card glass-panel">
+          <div className="login-header">
+            <ShieldCheck size={36} className="login-icon" />
+            <h3>CloudOps Encryption Gate</h3>
+            <span className="console-prefix">visitor-dev-environment // authentication required</span>
+          </div>
+
+          <form onSubmit={handleLoginSubmit} className="login-form">
+            <div className="form-group" style={{ marginBottom: '16px' }}>
+              <label>Enter Admin Passcode</label>
+              <input 
+                type="password" 
+                placeholder="••••••••••••"
+                value={passcode} 
+                onChange={(e) => setPasscode(e.target.value)} 
+                disabled={isAuthenticating}
+                autoFocus
+              />
+            </div>
+            
+            {loginError && (
+              <div className="login-error-message">
+                <AlertCircle size={14} />
+                <span>{loginError}</span>
+              </div>
+            )}
+
+            <button type="submit" className="btn-action btn-apply btn-login-submit" disabled={isAuthenticating} style={{ width: '100%', justifyContent: 'center' }}>
+              {isAuthenticating ? 'Decrypting...' : 'Decrypt Access'}
+            </button>
+          </form>
+
+          <a href="#/" className="btn-back btn-login-back" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <ArrowLeft size={16} /> Return to Portfolio
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   // Section Order handlers
   const moveSection = (index: number, direction: 'up' | 'down') => {

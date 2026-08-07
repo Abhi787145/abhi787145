@@ -53,15 +53,7 @@ const Navbar = ({ config }: NavbarProps) => {
               Contact Gateway
             </a>
           )}
-          <a href="#/admin" className="nav-link admin-nav-btn" style={{
-            color: '#10b981',
-            border: '1px dashed rgba(16, 185, 129, 0.4)',
-            padding: '4px 10px',
-            borderRadius: '4px',
-            marginLeft: '8px'
-          }} onClick={() => setMobileOpen(false)}>
-            Admin Console
-          </a>
+
         </nav>
         <button 
           className="mobile-toggle" 
