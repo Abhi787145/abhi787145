@@ -12,6 +12,13 @@ import Cursor from './components/Cursor';
 import './App.css';
 
 function App() {
+  React.useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="app-root-container">
       {/* Dynamic particles & custom cursor */}
