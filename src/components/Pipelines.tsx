@@ -23,7 +23,7 @@ const Pipelines = () => {
   const [currentStepIdx, setCurrentStepIdx] = useState(-1);
   const [logContent, setLogContent] = useState<string>('System idle. Ready to trigger pipeline.');
   const [totalSecs, setTotalSecs] = useState(0);
-  const logEndRef = useRef<HTMLDivElement>(null);
+  const consoleRef = useRef<HTMLDivElement>(null);
   
   const [steps, setSteps] = useState<PipelineStep[]>([
     { id: 'checkout', name: 'Checkout', status: 'idle', icon: FileCode, duration: 2 },
@@ -153,7 +153,9 @@ const Pipelines = () => {
 
   // Auto-scroll logs
   useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (consoleRef.current) {
+      consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
+    }
   }, [logContent]);
 
   return (
@@ -234,9 +236,8 @@ const Pipelines = () => {
               </span>
               <span className="console-timestamp">ANSI utf-8</span>
             </div>
-            <div className="console-output-area">
+            <div className="console-output-area" ref={consoleRef}>
               {logContent}
-              <div ref={logEndRef} />
             </div>
           </div>
         </div>
