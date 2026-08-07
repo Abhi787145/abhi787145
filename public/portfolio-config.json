@@ -1,0 +1,66 @@
+{
+  "profile": {
+    "name": "Abhishek Sharma",
+    "role": "DevOps Engineer",
+    "summary": "DevOps Engineer with hands-on experience in cloud infrastructure, application deployment, configuration management (Ansible), and system monitoring. Skilled in CI/CD pipelines, containerization (Docker, Kubernetes), and release management. Strong SQL Server database and production support experience.",
+    "email": "abhishek.sharma@example.com",
+    "linkedin": "https://www.linkedin.com/in/as787145",
+    "github": "https://github.com/abhisheksharma"
+  },
+  "sections": [
+    "landing",
+    "about",
+    "skills",
+    "pipelines",
+    "projects",
+    "experience",
+    "credentials",
+    "contact"
+  ],
+  "skills": [
+    { "name": "AWS", "bg": "#10172A" },
+    { "name": "Azure", "bg": "#0A1224" },
+    { "name": "Kubernetes", "bg": "#0A1B39" },
+    { "name": "Docker", "bg": "#051E39" },
+    { "name": "Terraform", "bg": "#0D091F" },
+    { "name": "SQL Server", "bg": "#1C0D0D" },
+    { "name": "Python", "bg": "#081726" },
+    { "name": "Jenkins", "bg": "#0A0A10" },
+    { "name": "Ansible", "bg": "#000000" }
+  ],
+  "skillsCategories": [
+    { "category": "AWS", "skills": "EC2, VPC, Availability Zone, S3, IAM, Security Groups, Lambda, Load Balancer" },
+    { "category": "Azure", "skills": "VM, Blob Storage, App Service, Key Vault, SQL Servers, Elastic Pool, Storage Accounts" },
+    { "category": "DevOps / CI/CD", "skills": "Terraform (IaC), Ansible, Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps" },
+    { "category": "Databases", "skills": "SQL Server Admin, SSMS, Redgate, PGAdmin, MongoDB Compass, IIS Web Server" },
+    { "category": "Languages & Dev", "skills": "Python, C/C++, .Net, Django" },
+    { "category": "AI & ITSM", "skills": "Prompting, SIEM monitoring, GLPI Ticketing, ITIL, System Troubleshooting" }
+  ],
+  "projects": [
+    {
+      "id": "shopnexa",
+      "title": "ShopNexa Storefront Integration",
+      "description": "Small-scale direct-to-customer dropshipping business platform. Configured cloud workloads to enable direct-from-manufacturer order dispatch and automated customer communications.",
+      "url": "https://theshopnexa.smartbiz.in/",
+      "tech": ["AWS Lambda", "VPC", "Route53", "MySQL", "Java", "Spring Boot", "HTML", "Angular", "Payment Gateway API", "WhatsApp API"]
+    }
+  ],
+  "experience": [
+    {
+      "role": "DevOps Support Engineer",
+      "company": "Simplify Healthcare",
+      "duration": "2023 - Present",
+      "tasks": [
+        "Executed daily deployments and monitored automated jobs for reliability and performance.",
+        "Applied strong troubleshooting and problem-solving skills across CI/CD pipelines and cloud environments.",
+        "Automated server configurations using Ansible and deployed container applications using Docker and Kubernetes.",
+        "Monitored cloud infrastructure using SIEM tools and Azure Alerts for proactive incident resolution."
+      ]
+    }
+  ],
+  "certifications": [
+    "Microsoft Certified: Azure Fundamentals (AZ-900)",
+    "AWS Certified Cloud Practitioner",
+    "Kubernetes Certified Administrator (CKA) - Coursework completed"
+  ]
+}

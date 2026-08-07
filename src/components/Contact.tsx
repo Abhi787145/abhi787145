@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Send, Terminal, CheckCircle, AlertTriangle } from 'lucide-react';
 import './styles/Contact.css';
 
-const Contact = () => {
+const Contact = ({ config }: { config: any }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -25,7 +25,7 @@ const Contact = () => {
     setStatusMessage('Deploying connection payload...');
 
     try {
-      // Direct Formspree submission (Formspree endpoint for as787145@gmail.com or AJAX fallback)
+      // Direct Formspree submission (Formspree endpoint for config email or AJAX fallback)
       const response = await fetch('https://formspree.io/f/mqazkypq', {
         method: 'POST',
         headers: {
@@ -51,7 +51,7 @@ const Contact = () => {
       // Success fallback to ensure smooth user experience during testing/viewing
       setTimeout(() => {
         setStatus('success');
-        setStatusMessage('[DEMO MODE] Connection simulated successfully! Email target: as787145@gmail.com');
+        setStatusMessage(`[DEMO MODE] Connection simulated successfully! Email target: ${config?.profile?.email || 'as787145@gmail.com'}`);
         setFormData({ name: '', email: '', message: '' });
       }, 1500);
     }

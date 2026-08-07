@@ -105,17 +105,44 @@ const ansibleSvg = `
 </svg>
 `;
 
-const skillsList = [
-  { name: 'AWS', svg: awsSvg, bg: '#10172A' },
-  { name: 'Azure', svg: azureSvg, bg: '#0A1224' },
-  { name: 'Kubernetes', svg: k8sSvg, bg: '#0A1B39' },
-  { name: 'Docker', svg: dockerSvg, bg: '#051E39' },
-  { name: 'Terraform', svg: terraformSvg, bg: '#0D091F' },
-  { name: 'SQL Server', svg: sqlServerSvg, bg: '#1C0D0D' },
-  { name: 'Python', svg: pythonSvg, bg: '#081726' },
-  { name: 'Jenkins', svg: jenkinsSvg, bg: '#0A0A10' },
-  { name: 'Ansible', svg: ansibleSvg, bg: '#000000' }
-];
+const svgLogoMap: Record<string, string> = {
+  'AWS': awsSvg,
+  'Azure': azureSvg,
+  'Kubernetes': k8sSvg,
+  'Docker': dockerSvg,
+  'Terraform': terraformSvg,
+  'SQL Server': sqlServerSvg,
+  'Python': pythonSvg,
+  'Jenkins': jenkinsSvg,
+  'Ansible': ansibleSvg
+};
+
+const createTextTexture = (text: string, colorBg: string): THREE.Texture => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    ctx.fillStyle = colorBg;
+    ctx.fillRect(0, 0, 256, 256);
+    
+    ctx.strokeStyle = '#06b6d4';
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.arc(128, 128, 110, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 36px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 128, 128);
+  }
+  
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+};
 
 // Helper to convert SVG to CanvasTexture
 const loadSvgTexture = (svgMarkup: string, colorBg: string): Promise<THREE.Texture> => {
@@ -154,7 +181,11 @@ const loadSvgTexture = (svgMarkup: string, colorBg: string): Promise<THREE.Textu
   });
 };
 
-const TechBalls = () => {
+type TechBallsProps = {
+  skills: Array<{ name: string; bg: string }>;
+};
+
+const TechBalls = ({ skills }: TechBallsProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -214,7 +245,38 @@ const TechBalls = () => {
     container.addEventListener('mouseleave', onMouseLeave);
 
     // Load textures and assemble spheres
-    Promise.all(skillsList.map(skill => loadSvgTexture(skill.svg, skill.bg)))
+    const loadAllTextures = async () => {
+      const loaded: THREE.Texture[] = [];
+      const itemsToLoad = skills && skills.length > 0 ? skills : [
+        { name: 'AWS', bg: '#10172A' },
+        { name: 'Azure', bg: '#0A1224' },
+        { name: 'Kubernetes', bg: '#0A1B39' },
+        { name: 'Docker', bg: '#051E39' },
+        { name: 'Terraform', bg: '#0D091F' },
+        { name: 'SQL Server', bg: '#1C0D0D' },
+        { name: 'Python', bg: '#081726' },
+        { name: 'Jenkins', bg: '#0A0A10' },
+        { name: 'Ansible', bg: '#000000' }
+      ];
+
+      for (const item of itemsToLoad) {
+        const svgLogo = svgLogoMap[item.name];
+        if (svgLogo) {
+          try {
+            const tex = await loadSvgTexture(svgLogo, item.bg);
+            loaded.push(tex);
+          } catch (e) {
+            console.error('Failed to load SVG for', item.name, e);
+            loaded.push(createTextTexture(item.name, item.bg));
+          }
+        } else {
+          loaded.push(createTextTexture(item.name, item.bg));
+        }
+      }
+      return loaded;
+    };
+
+    loadAllTextures()
       .then((textures) => {
         textures.forEach((texture, idx) => {
           // Premium physical glass material with emissive maps
@@ -433,7 +495,7 @@ const TechBalls = () => {
         container.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [skills]);
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>

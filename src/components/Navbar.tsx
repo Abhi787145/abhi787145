@@ -1,7 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import './styles/Navbar.css';
 
-const Navbar = () => {
+type NavbarProps = {
+  config: any;
+};
+
+const sectionLinks = [
+  { id: 'landing', label: 'Overview', href: '#overview' },
+  { id: 'about', label: 'About', href: '#about' },
+  { id: 'skills', label: 'Infrastructure', href: '#infrastructure' },
+  { id: 'pipelines', label: 'Pipelines', href: '#pipelines' },
+  { id: 'projects', label: 'Projects', href: '#projects' },
+  { id: 'experience', label: 'Experience', href: '#experience' },
+  { id: 'credentials', label: 'Credentials', href: '#credentials' }
+];
+
+const Navbar = ({ config }: NavbarProps) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -13,21 +27,41 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const logoName = config?.profile?.name 
+    ? config.profile.name.toLowerCase().split(' ')[0] 
+    : 'asharma';
+
   return (
     <header className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container">
-        <a href="#" class="logo">
-          <span class="console-prefix">devops-console:</span><span class="console-user">~asharma</span>
+        <a href="#" className="logo">
+          <span className="console-prefix">devops-console:</span><span className="console-user">~{logoName}</span>
         </a>
         <nav className={`nav-menu ${mobileOpen ? 'open' : ''}`}>
-          <a href="#overview" className="nav-link" onClick={() => setMobileOpen(false)}>Overview</a>
-          <a href="#about" className="nav-link" onClick={() => setMobileOpen(false)}>About</a>
-          <a href="#infrastructure" className="nav-link" onClick={() => setMobileOpen(false)}>Infrastructure</a>
-          <a href="#pipelines" className="nav-link" onClick={() => setMobileOpen(false)}>Pipelines</a>
-          <a href="#projects" className="nav-link" onClick={() => setMobileOpen(false)}>Projects</a>
-          <a href="#experience" className="nav-link" onClick={() => setMobileOpen(false)}>Experience</a>
-          <a href="#credentials" className="nav-link" onClick={() => setMobileOpen(false)}>Credentials</a>
-          <a href="#contact" className="nav-link contact-btn-nav" onClick={() => setMobileOpen(false)}>Contact Gateway</a>
+          {config?.sections && sectionLinks.map(link => {
+            if (config.sections.includes(link.id)) {
+              return (
+                <a key={link.id} href={link.href} className="nav-link" onClick={() => setMobileOpen(false)}>
+                  {link.label}
+                </a>
+              );
+            }
+            return null;
+          })}
+          {config?.sections?.includes('contact') && (
+            <a href="#contact" className="nav-link contact-btn-nav" onClick={() => setMobileOpen(false)}>
+              Contact Gateway
+            </a>
+          )}
+          <a href="#/admin" className="nav-link admin-nav-btn" style={{
+            color: '#10b981',
+            border: '1px dashed rgba(16, 185, 129, 0.4)',
+            padding: '4px 10px',
+            borderRadius: '4px',
+            marginLeft: '8px'
+          }} onClick={() => setMobileOpen(false)}>
+            Admin Console
+          </a>
         </nav>
         <button 
           className="mobile-toggle" 

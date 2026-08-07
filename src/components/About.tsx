@@ -1,7 +1,7 @@
 import React from 'react';
 import './styles/About.css';
 
-const About = () => {
+const About = ({ config }: { config: any }) => {
   return (
     <section id="about" className="about-section container">
       <div className="section-title-wrapper">
@@ -13,11 +13,8 @@ const About = () => {
       <div className="about-grid">
         <div className="about-left-summary glass-panel">
           <h4 className="summary-title">Profile Summary</h4>
-          <p>
-            I am a dedicated <strong>DevOps Engineer</strong> with hands-on experience managing and deploying robust cloud infrastructures and orchestrating secure CI/CD build releases. My background bridges the gap between fast-paced feature releases and long-term production uptime.
-          </p>
-          <p>
-            With strong roots in database administration (MS SQL Server) and system monitoring (Azure Alerts, SIEM logging), I specialize in detecting performance bottlenecks, configuring self-healing system triggers, and hardening server security profiles.
+          <p style={{ whiteSpace: 'pre-wrap' }}>
+            {config?.profile?.summary}
           </p>
         </div>
 

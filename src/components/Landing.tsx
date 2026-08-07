@@ -3,7 +3,7 @@ import OperatorModel from './OperatorModel';
 import TechBalls from './TechBalls';
 import './styles/Landing.css';
 
-const Landing = () => {
+const Landing = ({ config }: { config: any }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [activeTitleIdx, setActiveTitleIdx] = useState(0);
   const titles = [
@@ -181,7 +181,7 @@ const Landing = () => {
             </span>
           </div>
 
-          <h1 className="landing-name">Abhishek Sharma</h1>
+          <h1 className="landing-name">{config?.profile?.name || 'Abhishek Sharma'}</h1>
           
           <div className="title-rotator-wrapper">
             <span className="static-prefix">Expert</span>{' '}
@@ -189,7 +189,7 @@ const Landing = () => {
           </div>
 
           <p className="landing-summary">
-            DevOps & Systems Engineer with 3+ years of expertise automating cloud deployments, container orchestration, and high-availability database replication. Specializes in building robust, self-healing platforms.
+            {config?.profile?.summary}
           </p>
 
           <div className="landing-actions">
@@ -202,15 +202,21 @@ const Landing = () => {
           </div>
 
           <div className="landing-social-links">
-            <a href="https://www.linkedin.com/in/as787145" target="_blank" rel="noopener noreferrer" className="landing-social-icon" title="LinkedIn">
-              <i className="fa-brands fa-linkedin"></i>
-            </a>
-            <a href="mailto:as787145@gmail.com" className="landing-social-icon" title="Send Email">
-              <i className="fa-solid fa-envelope"></i>
-            </a>
-            <a href="tel:+918308989160" className="landing-social-icon" title="Call">
-              <i className="fa-solid fa-phone"></i>
-            </a>
+            {config?.profile?.linkedin && (
+              <a href={config.profile.linkedin} target="_blank" rel="noopener noreferrer" className="landing-social-icon" title="LinkedIn">
+                <i className="fa-brands fa-linkedin"></i>
+              </a>
+            )}
+            {config?.profile?.email && (
+              <a href={`mailto:${config.profile.email}`} className="landing-social-icon" title="Send Email">
+                <i className="fa-solid fa-envelope"></i>
+              </a>
+            )}
+            {config?.profile?.github && (
+              <a href={config.profile.github} target="_blank" rel="noopener noreferrer" className="landing-social-icon" title="GitHub">
+                <i className="fa-brands fa-github"></i>
+              </a>
+            )}
           </div>
         </div>
 
@@ -221,7 +227,7 @@ const Landing = () => {
               <span className="card-ping">Status: Active</span>
             </div>
             <div className="canvas-wrapper">
-              <TechBalls />
+              <TechBalls skills={config?.skills || []} />
             </div>
           </div>
 

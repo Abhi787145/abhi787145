@@ -2,40 +2,7 @@ import React from 'react';
 import { Award, GraduationCap, Calendar, Landmark, BookOpen } from 'lucide-react';
 import './styles/Credentials.css';
 
-const Credentials = () => {
-  const certifications = [
-    {
-      title: 'MS Azure - AZ-900',
-      issuer: 'Microsoft',
-      date: 'Oct 2025',
-      badge: 'Cloud'
-    },
-    {
-      title: 'Generative AI Foundation',
-      issuer: 'upGrad — Microsoft',
-      date: 'June 2025',
-      badge: 'Artificial Intelligence'
-    },
-    {
-      title: 'AWS Certified Course',
-      issuer: 'Cloud & DevOps HUB',
-      date: 'March 2026',
-      badge: 'DevOps'
-    },
-    {
-      title: 'Cyber Security Tools & Attacks',
-      issuer: 'Coursera',
-      date: 'Aug 2020',
-      badge: 'Security'
-    },
-    {
-      title: 'MNA + CloudV2',
-      issuer: 'Jetking',
-      date: 'June 2019',
-      badge: 'Systems Infrastructure'
-    }
-  ];
-
+const Credentials = ({ config }: { config: any }) => {
   return (
     <section id="credentials" className="credentials-section container">
       <div className="section-title-wrapper">
@@ -48,14 +15,12 @@ const Credentials = () => {
         <div className="certifications-column">
           <h4 className="column-title"><Award size={18} /> Professional Certifications</h4>
           <div className="certs-list">
-            {certifications.map((cert, index) => (
+            {(config?.certifications || []).map((cert: string, index: number) => (
               <div className="certification-card glass-panel" key={index}>
                 <div className="cert-header">
-                  <span className="cert-badge">{cert.badge}</span>
-                  <span className="cert-date"><Calendar size={12} /> {cert.date}</span>
+                  <span className="cert-badge">Verified</span>
                 </div>
-                <h5 className="cert-title">{cert.title}</h5>
-                <p className="cert-issuer">Issued by: {cert.issuer}</p>
+                <h5 className="cert-title" style={{ marginTop: '8px', fontSize: '0.95rem' }}>{cert}</h5>
               </div>
             ))}
           </div>

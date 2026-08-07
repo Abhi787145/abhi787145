@@ -6,85 +6,76 @@ type LogLine = {
   type: 'input' | 'output' | 'error' | 'system';
 };
 
-const commands: Record<string, () => string> = {
-  help: () => `Available commands:
-  whoami          - Brief overview profile of Abhishek Sharma
-  skills          - Detail of DevOps, Cloud & Development skills
-  projects        - Overview of provisioned AWS Drop Shipping project
-  experience      - Review work history at Simplify Healthcare
-  certifications  - List active course certifications (AZ-900, AWS, etc.)
-  pipeline        - Run the simulated CI/CD build & deploy pipeline
-  cat info.txt    - Display contact routes & endpoint details
-  clear           - Wipe terminal logs`,
-
-  whoami: () => `NAME:            Abhishek Sharma
-ROLE:            DevOps Engineer
-PROFILE SUMMARY: DevOps Engineer with hands-on experience in cloud infrastructure,
-                 application deployment, configuration management (Ansible), and
-                 system monitoring. Skilled in CI/CD pipelines, containerization (Docker,
-                 Kubernetes), and release management. Strong SQL Server database and
-                 production support experience.`,
-
-  skills: () => `CATEGORY             SKILLSET
-AWS                  EC2, VPC, Availability Zone, S3, IAM, Security Groups, Lambda, Load Balancer
-Azure                VM, Blob Storage, App Service, Key Vault, SQL Servers, Elastic Pool, Storage Accounts
-DevOps / CI/CD       Terraform (IaC), Ansible, Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps
-Databases            SQL Server Admin, SSMS, Redgate, PGAdmin, MongoDB Compass, IIS Web Server
-Languages & Dev      Python, C/C++, .Net, Django
-AI & ITSM            Prompting, SIEM monitoring, GLPI Ticketing, ITIL, System Troubleshooting`,
-
-  projects: () => `MODULE: Project - Drop Shipping (AWS infrastructure)
-STATUS: Deployed successfully (Active)
-DESCRIPTION: Provisioned 40+ AWS services using modular Terraform from scratch.
-ARCHITECTURAL METRICS:
-  - 1 Virtual Private Cloud (VPC) with public/private subnetting.
-  - Multi-AZ Web Application Load Balancer (ALB) + EC2 Auto Scaling Groups.
-  - Secure SQL Relational Database (RDS Multi-AZ).
-  - CloudWatch metric monitoring & alarms integration.
-  - Cost optimized through custom pricing configurations.`,
-
-  experience: () => `[01/2023 - Present] Simplify Healthcare - Associate Application Deployment Engineer
-PROJECT: Multi Project Environment
-TASKS DELIVERED:
-  * Managed container workloads on Docker & Kubernetes cluster nodes.
-  * Deployed apps onto Azure App Services; administered storage configurations.
-  * Administered SQL database jobs, Bacpac migrations, and backups.
-  * Configured SIEM and Azure Alerts mapping memory, CPU, and Disk metrics.
-  * Handled daily production deployments; troubleshoot pipeline blockers.`,
-
-  certifications: () => `ACTIVE BADGES:
-  - Generative AI Foundation (June 2025) - Microsoft & upGrad
-  - Microsoft Azure Fundamentals AZ-900 (October 2025)
-  - AWS Certification (March 2026) - Cloud & DevOps HUB
-  - Cyber Security Tools & Attacks (August 2020) - Coursera
-  - MNA + CloudV2 (June 2019) - Jetking`,
-
-  "cat info.txt": () => `ENDPOINT CONTACT ROUTES:
-  - Email:      as787145@gmail.com
-  - Phone:      +91 8308989160
-  - LinkedIn:   https://www.linkedin.com/in/as787145
-  - Github:     https://github.com/abhisheksharma (simulated)
-  - Cluster:    visitor-prod-1`,
-
-  pipeline: () => {
-    setTimeout(() => {
-      const el = document.getElementById('pipelines');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-      window.dispatchEvent(new Event('trigger-pipeline-sim'));
-    }, 500);
-    return `[SYSTEM] Redirecting viewport context to CI/CD pipeline controller...`;
-  }
-};
-
-const Skills = () => {
+const Skills = ({ config }: { config: any }) => {
   const [history, setHistory] = useState<LogLine[]>([
     { text: 'System session initialized. Welcome guest user.', type: 'system' },
     { text: 'Type "help" to view the available commands in this terminal.', type: 'output' }
   ]);
   const [inputValue, setInputValue] = useState('');
   const terminalBodyRef = useRef<HTMLDivElement | null>(null);
+
+  const commands: Record<string, () => string> = {
+    help: () => `Available commands:
+  whoami          - Brief overview profile of ${config?.profile?.name || 'Abhishek Sharma'}
+  skills          - Detail of DevOps, Cloud & Development skills
+  projects        - Overview of provisioned AWS Drop Shipping project
+  experience      - Review work history
+  certifications  - List active course certifications (AZ-900, AWS, etc.)
+  pipeline        - Run the simulated CI/CD build & deploy pipeline
+  cat info.txt    - Display contact routes & endpoint details
+  clear           - Wipe terminal logs`,
+
+    whoami: () => `NAME:            ${config?.profile?.name || 'Abhishek Sharma'}
+ROLE:            ${config?.profile?.role || 'DevOps Engineer'}
+PROFILE SUMMARY: ${config?.profile?.summary || ''}`,
+
+    skills: () => {
+      const header = `CATEGORY             SKILLSET\n`;
+      const body = (config?.skillsCategories || []).map((c: any) => {
+        const catLabel = c.category.padEnd(20);
+        return `${catLabel} ${c.skills}`;
+      }).join('\n');
+      return header + body;
+    },
+
+    projects: () => {
+      return (config?.projects || []).map((p: any) => {
+        return `MODULE: Project - ${p.title}
+STATUS: Active
+DESCRIPTION: ${p.description}
+TECH COMPONENTS: ${p.tech.join(', ')}`;
+      }).join('\n\n');
+    },
+
+    experience: () => {
+      return (config?.experience || []).map((e: any) => {
+        const header = `[${e.duration}] ${e.company} - ${e.role}\nTASKS DELIVERED:\n`;
+        const tasks = e.tasks.map((t: string) => `  * ${t}`).join('\n');
+        return header + tasks;
+      }).join('\n\n');
+    },
+
+    certifications: () => {
+      return `ACTIVE BADGES:\n` + (config?.certifications || []).map((c: string) => `  - ${c}`).join('\n');
+    },
+
+    "cat info.txt": () => `ENDPOINT CONTACT ROUTES:
+  - Email:      ${config?.profile?.email || 'N/A'}
+  - LinkedIn:   ${config?.profile?.linkedin || 'N/A'}
+  - Github:     ${config?.profile?.github || 'N/A'}
+  - Cluster:    visitor-prod-1`,
+
+    pipeline: () => {
+      setTimeout(() => {
+        const el = document.getElementById('pipelines');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+        window.dispatchEvent(new Event('trigger-pipeline-sim'));
+      }, 500);
+      return `[SYSTEM] Redirecting viewport context to CI/CD pipeline controller...`;
+    }
+  };
 
   useEffect(() => {
     if (terminalBodyRef.current) {
