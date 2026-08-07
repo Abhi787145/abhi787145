@@ -34,8 +34,8 @@ const PREDEFINED_COLORS = [
 ];
 
 const Admin = ({ config, setConfig }: AdminProps) => {
-  const [isAuthorized, setIsAuthorized] = useState(() => {
-    return sessionStorage.getItem('admin_authenticated') === 'true';
+  const [authRole, setAuthRole] = useState<'admin' | 'viewer' | null>(() => {
+    return sessionStorage.getItem('admin_auth_role') as 'admin' | 'viewer' | null;
   });
   const [passcode, setPasscode] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -55,9 +55,14 @@ const Admin = ({ config, setConfig }: AdminProps) => {
 
     try {
       const hashed = await sha256(passcode);
-      if (hashed === '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9') {
+      if (hashed === 'eeb67a678a452fe60494f0b84dd526f42a54ad8fbf7905a9e5be40c4b55a90d3') {
         sessionStorage.setItem('admin_authenticated', 'true');
-        setIsAuthorized(true);
+        sessionStorage.setItem('admin_auth_role', 'admin');
+        setAuthRole('admin');
+      } else if (hashed === 'c1eb02bf48de4dc1f0b1669a8004046b7ce8757edb580d8de465159bf5a5092a') {
+        sessionStorage.setItem('admin_authenticated', 'true');
+        sessionStorage.setItem('admin_auth_role', 'viewer');
+        setAuthRole('viewer');
       } else {
         setLoginError('Access Denied: Invalid Decryption Key');
       }
@@ -67,6 +72,9 @@ const Admin = ({ config, setConfig }: AdminProps) => {
       setIsAuthenticating(false);
     }
   };
+
+  const isAuthorized = authRole !== null;
+  const isReadOnly = authRole === 'viewer';
 
   const [activeTab, setActiveTab] = useState<'profile' | 'skills' | 'projects' | 'experience'>('profile');
   const [localConfig, setLocalConfig] = useState(JSON.parse(JSON.stringify(config)));
@@ -344,7 +352,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
   };
 
   return (
-    <div className="admin-dashboard-container">
+    <div className={`admin-dashboard-container ${isReadOnly ? 'read-only' : ''}`}>
       <header className="admin-header">
         <div className="admin-header-left">
           <a href="#/" className="btn-back">
@@ -352,22 +360,37 @@ const Admin = ({ config, setConfig }: AdminProps) => {
           </a>
           <div className="admin-title-group">
             <h2>CloudOps CMS Console</h2>
-            <span className="console-prefix">visitor-dev-environment // write-access active</span>
+            <span className="console-prefix">
+              {isReadOnly 
+                ? 'visitor-dev-environment // read-only session' 
+                : 'visitor-dev-environment // write-access active'}
+            </span>
           </div>
         </div>
 
         <div className="admin-actions">
-          <button className="btn-action btn-apply" onClick={applyLive}>
-            <Save size={16} /> Apply Live
-          </button>
+          {!isReadOnly && (
+            <button className="btn-action btn-apply" onClick={applyLive}>
+              <Save size={16} /> Apply Live
+            </button>
+          )}
           <button className="btn-action btn-export" onClick={exportConfig}>
             <Download size={16} /> Export JSON
           </button>
-          <button className="btn-action btn-reset" onClick={resetConfig}>
-            <RotateCcw size={16} /> Reset defaults
-          </button>
+          {!isReadOnly && (
+            <button className="btn-action btn-reset" onClick={resetConfig}>
+              <RotateCcw size={16} /> Reset defaults
+            </button>
+          )}
         </div>
       </header>
+
+      {isReadOnly && (
+        <div className="status-banner error" style={{ background: 'rgba(59, 130, 246, 0.15)', borderColor: 'rgba(59, 130, 246, 0.3)', color: '#60a5fa' }}>
+          <AlertCircle size={18} style={{ color: '#60a5fa' }} />
+          <span>READ-ONLY VIEW: You are logged in as a guest viewer. Edits and saves are disabled.</span>
+        </div>
+      )}
 
       {statusMessage.text && (
         <div className={`status-banner ${statusMessage.type}`}>
@@ -405,7 +428,8 @@ const Admin = ({ config, setConfig }: AdminProps) => {
         </aside>
 
         <main className="admin-main">
-          {/* TAB 1: PROFILE & LAYOUT */}
+          <fieldset disabled={isReadOnly} style={{ border: 'none', padding: 0, margin: 0, width: '100%' }}>
+            {/* TAB 1: PROFILE & LAYOUT */}
           {activeTab === 'profile' && (
             <div className="tab-pane">
               <h3>Profile Settings</h3>
@@ -752,6 +776,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
               </div>
             </div>
           )}
+          </fieldset>
         </main>
       </div>
     </div>

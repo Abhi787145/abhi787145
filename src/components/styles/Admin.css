@@ -697,3 +697,13 @@
   width: 100%;
   justify-content: center;
 }
+
+/* Guest Viewer button concealment */
+.admin-dashboard-container.read-only .btn-add-item,
+.admin-dashboard-container.read-only .btn-add-task-item,
+.admin-dashboard-container.read-only .btn-delete-card,
+.admin-dashboard-container.read-only .btn-delete-row,
+.admin-dashboard-container.read-only .btn-delete-task-row,
+.admin-dashboard-container.read-only .btn-order-arrow {
+  display: none !important;
+}
