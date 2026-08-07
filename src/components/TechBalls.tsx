@@ -97,6 +97,14 @@ const jenkinsSvg = `
 </svg>
 `;
 
+const ansibleSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="256" height="256">
+  <rect width="100" height="100" fill="none"/>
+  <circle cx="50" cy="50" r="42" fill="#000000" stroke="#EE0000" stroke-width="4"/>
+  <path d="M 50 18 L 18 78 H 32 L 50 44 L 68 78 H 82 L 50 18 Z M 50 34 L 59 52 H 41 L 50 34 Z" fill="#FFFFFF"/>
+</svg>
+`;
+
 const skillsList = [
   { name: 'AWS', svg: awsSvg, bg: '#10172A' },
   { name: 'Azure', svg: azureSvg, bg: '#0A1224' },
@@ -105,7 +113,8 @@ const skillsList = [
   { name: 'Terraform', svg: terraformSvg, bg: '#0D091F' },
   { name: 'SQL Server', svg: sqlServerSvg, bg: '#1C0D0D' },
   { name: 'Python', svg: pythonSvg, bg: '#081726' },
-  { name: 'Jenkins', svg: jenkinsSvg, bg: '#0A0A10' }
+  { name: 'Jenkins', svg: jenkinsSvg, bg: '#0A0A10' },
+  { name: 'Ansible', svg: ansibleSvg, bg: '#000000' }
 ];
 
 // Helper to convert SVG to CanvasTexture

@@ -13,7 +13,7 @@ const Experience = () => {
 
   const extraResponsibilities = [
     'Oversaw SDLC processes to ensure smooth development, deployment, and operational stability.',
-    'Deployed and managed containerized applications using Docker and Kubernetes.',
+    'Automated server configurations using Ansible and deployed container applications using Docker and Kubernetes.',
     'Monitored cloud infrastructure using SIEM tools and Azure Alerts for proactive incident resolution.'
   ];
 

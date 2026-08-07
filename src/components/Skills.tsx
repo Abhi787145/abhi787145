@@ -20,14 +20,15 @@ const commands: Record<string, () => string> = {
   whoami: () => `NAME:            Abhishek Sharma
 ROLE:            DevOps Engineer
 PROFILE SUMMARY: DevOps Engineer with hands-on experience in cloud infrastructure,
-                 application deployment, and system monitoring. Skilled in CI/CD
-                 pipelines, containerization (Docker, Kubernetes), and release
-                 management. Strong SQL Server database and production support experience.`,
+                 application deployment, configuration management (Ansible), and
+                 system monitoring. Skilled in CI/CD pipelines, containerization (Docker,
+                 Kubernetes), and release management. Strong SQL Server database and
+                 production support experience.`,
 
   skills: () => `CATEGORY             SKILLSET
 AWS                  EC2, VPC, Availability Zone, S3, IAM, Security Groups, Lambda, Load Balancer
 Azure                VM, Blob Storage, App Service, Key Vault, SQL Servers, Elastic Pool, Storage Accounts
-DevOps / CI/CD       Terraform (IaC), Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps
+DevOps / CI/CD       Terraform (IaC), Ansible, Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps
 Databases            SQL Server Admin, SSMS, Redgate, PGAdmin, MongoDB Compass, IIS Web Server
 Languages & Dev      Python, C/C++, .Net, Django
 AI & ITSM            Prompting, SIEM monitoring, GLPI Ticketing, ITIL, System Troubleshooting`,
@@ -102,9 +103,7 @@ const Skills = () => {
 
     // 2. Process command outputs
     if (lower === 'clear') {
-      setHistory([
-        { text: 'System logs cleared. Session active.', type: 'system' }
-      ]);
+      setHistory([]);
     } else if (commands[lower]) {
       const output = commands[lower]();
       setHistory(prev => [...prev, { text: output, type: 'output' }]);
@@ -172,7 +171,6 @@ Terraform has been successfully initialized!`;
               onKeyDown={handleKeyDown}
               className="terminal-input"
               placeholder="Type a command (e.g. 'help')..."
-              autoFocus
             />
           </div>
         </div>
