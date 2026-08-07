@@ -55,7 +55,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
 
     try {
       const hashed = await sha256(passcode);
-      if (hashed === 'eeb67a678a452fe60494f0b84dd526f42a54ad8fbf7905a9e5be40c4b55a90d3') {
+      if (hashed === '9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e') {
         sessionStorage.setItem('admin_authenticated', 'true');
         sessionStorage.setItem('admin_auth_role', 'admin');
         setAuthRole('admin');
