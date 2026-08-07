@@ -38,6 +38,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
     return sessionStorage.getItem('admin_auth_role') as 'admin' | 'viewer' | null;
   });
   const [passcode, setPasscode] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'viewer'>('viewer');
   const [loginError, setLoginError] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -54,17 +55,19 @@ const Admin = ({ config, setConfig }: AdminProps) => {
     setIsAuthenticating(true);
 
     try {
-      const hashed = await sha256(passcode);
-      if (hashed === '9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e') {
-        sessionStorage.setItem('admin_authenticated', 'true');
-        sessionStorage.setItem('admin_auth_role', 'admin');
-        setAuthRole('admin');
-      } else if (hashed === 'c1eb02bf48de4dc1f0b1669a8004046b7ce8757edb580d8de465159bf5a5092a') {
+      if (selectedRole === 'viewer') {
         sessionStorage.setItem('admin_authenticated', 'true');
         sessionStorage.setItem('admin_auth_role', 'viewer');
         setAuthRole('viewer');
       } else {
-        setLoginError('Access Denied: Invalid Decryption Key');
+        const hashed = await sha256(passcode);
+        if (hashed === '9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e') {
+          sessionStorage.setItem('admin_authenticated', 'true');
+          sessionStorage.setItem('admin_auth_role', 'admin');
+          setAuthRole('admin');
+        } else {
+          setLoginError('Access Denied: Invalid Decryption Key');
+        }
       }
     } catch (err) {
       setLoginError('Authentication engine error. Please try again.');
@@ -96,18 +99,48 @@ const Admin = ({ config, setConfig }: AdminProps) => {
             <span className="console-prefix">visitor-dev-environment // authentication required</span>
           </div>
 
+          <div className="role-selector-bar">
+            <button 
+              type="button" 
+              className={`role-tab ${selectedRole === 'viewer' ? 'active' : ''}`}
+              onClick={() => { setSelectedRole('viewer'); setLoginError(''); }}
+            >
+              Guest Viewer
+            </button>
+            <button 
+              type="button" 
+              className={`role-tab ${selectedRole === 'admin' ? 'active' : ''}`}
+              onClick={() => { setSelectedRole('admin'); setLoginError(''); }}
+            >
+              Administrator
+            </button>
+          </div>
+
           <form onSubmit={handleLoginSubmit} className="login-form">
-            <div className="form-group" style={{ marginBottom: '16px' }}>
-              <label>Enter Admin Passcode</label>
-              <input 
-                type="password" 
-                placeholder="••••••••••••"
-                value={passcode} 
-                onChange={(e) => setPasscode(e.target.value)} 
-                disabled={isAuthenticating}
-                autoFocus
-              />
-            </div>
+            {selectedRole === 'admin' ? (
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label>Enter Admin Passcode</label>
+                <input 
+                  type="password" 
+                  placeholder="••••••••••••"
+                  value={passcode} 
+                  onChange={(e) => setPasscode(e.target.value)} 
+                  disabled={isAuthenticating}
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <p className="login-guest-info" style={{
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)',
+                fontFamily: 'monospace',
+                textAlign: 'center',
+                lineHeight: '1.4',
+                marginBottom: '8px'
+              }}>
+                Authenticate with read-only access to browse layout configuration matrices, timelines, and credentials lists.
+              </p>
+            )}
             
             {loginError && (
               <div className="login-error-message">
@@ -117,7 +150,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
             )}
 
             <button type="submit" className="btn-action btn-apply btn-login-submit" disabled={isAuthenticating} style={{ width: '100%', justifyContent: 'center' }}>
-              {isAuthenticating ? 'Decrypting...' : 'Decrypt Access'}
+              {isAuthenticating ? 'Decrypting...' : selectedRole === 'admin' ? 'Decrypt Access' : 'Login as Viewer'}
             </button>
           </form>
 
@@ -355,7 +388,11 @@ const Admin = ({ config, setConfig }: AdminProps) => {
     <div className={`admin-dashboard-container ${isReadOnly ? 'read-only' : ''}`}>
       <header className="admin-header">
         <div className="admin-header-left">
-          <a href="#/" className="btn-back">
+          <a href="#/" className="btn-back" onClick={() => {
+            sessionStorage.removeItem('admin_authenticated');
+            sessionStorage.removeItem('admin_auth_role');
+            setAuthRole(null);
+          }}>
             <ArrowLeft size={16} /> Portfolio Home
           </a>
           <div className="admin-title-group">

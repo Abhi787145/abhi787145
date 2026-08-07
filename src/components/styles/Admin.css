@@ -707,3 +707,40 @@
 .admin-dashboard-container.read-only .btn-order-arrow {
   display: none !important;
 }
+
+/* Segmented Role Selector Bar */
+.role-selector-bar {
+  display: flex;
+  background: rgba(14, 22, 35, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 4px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.role-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+  text-transform: uppercase;
+}
+
+.role-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.role-tab.active {
+  color: #0b1329;
+  font-weight: 700;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+}
