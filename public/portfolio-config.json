@@ -5,7 +5,12 @@
     "summary": "DevOps Engineer with hands-on experience in cloud infrastructure, application deployment, configuration management (Ansible), and system monitoring. Skilled in CI/CD pipelines, containerization (Docker, Kubernetes), and release management. Strong SQL Server database and production support experience.",
     "email": "abhishek.sharma@example.com",
     "linkedin": "https://www.linkedin.com/in/as787145",
-    "github": "https://github.com/abhisheksharma"
+    "github": "https://github.com/abhisheksharma",
+    "formspreeId": "mqazkypq"
+  },
+  "settings": {
+    "adminHash": "9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e",
+    "viewerHash": "c1eb02bf48de4dc1f0b1669a8004046b7ce8757edb580d8de465159bf5a5092a"
   },
   "sections": [
     "landing",

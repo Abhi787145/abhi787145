@@ -25,8 +25,8 @@ const Contact = ({ config }: { config: any }) => {
     setStatusMessage('Deploying connection payload...');
 
     try {
-      // Direct Formspree submission (Formspree endpoint for config email or AJAX fallback)
-      const response = await fetch('https://formspree.io/f/mqazkypq', {
+      const formspreeId = config?.profile?.formspreeId || 'mqazkypq';
+      const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

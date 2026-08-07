@@ -61,7 +61,8 @@ const Admin = ({ config, setConfig }: AdminProps) => {
         setAuthRole('viewer');
       } else {
         const hashed = await sha256(passcode);
-        if (hashed === '9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e') {
+        const adminHash = config?.settings?.adminHash || '9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e';
+        if (hashed === adminHash) {
           sessionStorage.setItem('admin_authenticated', 'true');
           sessionStorage.setItem('admin_auth_role', 'admin');
           setAuthRole('admin');
@@ -504,6 +505,15 @@ const Admin = ({ config, setConfig }: AdminProps) => {
                     type="email" 
                     value={localConfig.profile.email} 
                     onChange={(e) => handleProfileChange('email', e.target.value)} 
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Formspree Form ID</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. mqazkypq"
+                    value={localConfig.profile.formspreeId || ''} 
+                    onChange={(e) => handleProfileChange('formspreeId', e.target.value)} 
                   />
                 </div>
                 <div className="form-group">
