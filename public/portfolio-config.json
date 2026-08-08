@@ -8,7 +8,7 @@
     "github": "https://github.com/abhisheksharma",
     "formspreeId": "mqazkypq"
   },
-  "theme": "cyber-cyan",
+  "theme": "crimson-flame",
   "titles": [
     "DevOps Engineer",
     "Cloud Infrastructure Architect",
@@ -18,8 +18,7 @@
   "settings": {
     "adminHash": "9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e",
     "viewerHash": "c1eb02bf48de4dc1f0b1669a8004046b7ce8757edb580d8de465159bf5a5092a",
-    "enableGuestViewer": true,
-    "firebaseConfig": null
+    "enableGuestViewer": true
   },
   "sections": [
     "landing",
@@ -32,23 +31,68 @@
     "contact"
   ],
   "skills": [
-    { "name": "AWS", "bg": "#10172A" },
-    { "name": "Azure", "bg": "#0A1224" },
-    { "name": "Kubernetes", "bg": "#0A1B39" },
-    { "name": "Docker", "bg": "#051E39" },
-    { "name": "Terraform", "bg": "#0D091F" },
-    { "name": "SQL Server", "bg": "#1C0D0D" },
-    { "name": "Python", "bg": "#081726" },
-    { "name": "Jenkins", "bg": "#0A0A10" },
-    { "name": "Ansible", "bg": "#000000" }
+    {
+      "name": "AWS",
+      "bg": "#10172A"
+    },
+    {
+      "name": "Azure",
+      "bg": "#0A1224"
+    },
+    {
+      "name": "Kubernetes",
+      "bg": "#0A1B39"
+    },
+    {
+      "name": "Docker",
+      "bg": "#051E39"
+    },
+    {
+      "name": "Terraform",
+      "bg": "#0D091F"
+    },
+    {
+      "name": "SQL Server",
+      "bg": "#1C0D0D"
+    },
+    {
+      "name": "Python",
+      "bg": "#081726"
+    },
+    {
+      "name": "Jenkins",
+      "bg": "#0A0A10"
+    },
+    {
+      "name": "Ansible",
+      "bg": "#000000"
+    }
   ],
   "skillsCategories": [
-    { "category": "AWS", "skills": "EC2, VPC, Availability Zone, S3, IAM, Security Groups, Lambda, Load Balancer" },
-    { "category": "Azure", "skills": "VM, Blob Storage, App Service, Key Vault, SQL Servers, Elastic Pool, Storage Accounts" },
-    { "category": "DevOps / CI/CD", "skills": "Terraform (IaC), Ansible, Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps" },
-    { "category": "Databases", "skills": "SQL Server Admin, SSMS, Redgate, PGAdmin, MongoDB Compass, IIS Web Server" },
-    { "category": "Languages & Dev", "skills": "Python, C/C++, .Net, Django" },
-    { "category": "AI & ITSM", "skills": "Prompting, SIEM monitoring, GLPI Ticketing, ITIL, System Troubleshooting" }
+    {
+      "category": "AWS",
+      "skills": "EC2, VPC, Availability Zone, S3, IAM, Security Groups, Lambda, Load Balancer"
+    },
+    {
+      "category": "Azure",
+      "skills": "VM, Blob Storage, App Service, Key Vault, SQL Servers, Elastic Pool, Storage Accounts"
+    },
+    {
+      "category": "DevOps / CI/CD",
+      "skills": "Terraform (IaC), Ansible, Kubernetes, Docker, Git/GitHub, Jenkins, Azure DevOps"
+    },
+    {
+      "category": "Databases",
+      "skills": "SQL Server Admin, SSMS, Redgate, PGAdmin, MongoDB Compass, IIS Web Server"
+    },
+    {
+      "category": "Languages & Dev",
+      "skills": "Python, C/C++, .Net, Django"
+    },
+    {
+      "category": "AI & ITSM",
+      "skills": "Prompting, SIEM monitoring, GLPI Ticketing, ITIL, System Troubleshooting"
+    }
   ],
   "projects": [
     {
@@ -56,7 +100,18 @@
       "title": "ShopNexa Storefront Integration",
       "description": "Small-scale direct-to-customer dropshipping business platform. Configured cloud workloads to enable direct-from-manufacturer order dispatch and automated customer communications.",
       "url": "https://theshopnexa.smartbiz.in/",
-      "tech": ["AWS Lambda", "VPC", "Route53", "MySQL", "Java", "Spring Boot", "HTML", "Angular", "Payment Gateway API", "WhatsApp API"]
+      "tech": [
+        "AWS Lambda",
+        "VPC",
+        "Route53",
+        "MySQL",
+        "Java",
+        "Spring Boot",
+        "HTML",
+        "Angular",
+        "Payment Gateway API",
+        "WhatsApp API"
+      ]
     }
   ],
   "experience": [
@@ -76,5 +131,6 @@
     "Microsoft Certified: Azure Fundamentals (AZ-900)",
     "AWS Certified Cloud Practitioner",
     "Kubernetes Certified Administrator (CKA) - Coursework completed"
-  ]
+  ],
+  "cliSkills": {}
 }
