@@ -8,7 +8,7 @@
     "github": "https://github.com/abhisheksharma",
     "formspreeId": "mqazkypq"
   },
-  "theme": "crimson-flame",
+  "theme": "midnight-stealth",
   "titles": [
     "DevOps Engineer",
     "Cloud Infrastructure Architect",
@@ -16,7 +16,9 @@
     "Database & Observability Admin"
   ],
   "settings": {
-    "adminHash": "9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e"
+    "adminHash": "9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e",
+    "viewerHash": "c1eb02bf48de4dc1f0b1669a8004046b7ce8757edb580d8de465159bf5a5092a",
+    "enableGuestViewer": true
   },
   "sections": [
     "landing",
