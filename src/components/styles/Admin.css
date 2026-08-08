@@ -1296,3 +1296,113 @@
     gap: 4px;
   }
 }
+
+/* ==========================================================================
+   GitHub Direct Sync Styles
+   ========================================================================== */
+.btn-github-sync {
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #fff;
+  font-weight: 700;
+}
+
+.btn-github-sync:hover {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+  transform: translateY(-1px);
+}
+
+.github-sync-section {
+  background: rgba(139, 92, 246, 0.04);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(8, 12, 22, 0.95);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(139, 92, 246, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-title h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.btn-close-modal {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.github-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+

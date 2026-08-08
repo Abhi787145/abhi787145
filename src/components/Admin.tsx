@@ -5,6 +5,7 @@ import {
   Palette, Tag, History, Undo2, RefreshCw, GitCompare, Sparkles, X, Cloud, CloudRain
 } from 'lucide-react';
 import { saveRemotePortfolio } from '../services/firebase';
+import { syncToGitHub } from '../services/githubSync';
 import './styles/Admin.css';
 
 type AdminProps = {
@@ -58,6 +59,13 @@ const Admin = ({ config, setConfig }: AdminProps) => {
   const [selectedRole, setSelectedRole] = useState<'admin' | 'viewer'>('viewer');
   const [loginError, setLoginError] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  // GitHub Direct Sync state
+  const [githubToken, setGithubToken] = useState(() => localStorage.getItem('github_cms_token') || '');
+  const [githubOwner, setGithubOwner] = useState(() => localStorage.getItem('github_cms_owner') || 'Abhi787145');
+  const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem('github_cms_repo') || 'devops-portfolio');
+  const [isSyncingGithub, setIsSyncingGithub] = useState(false);
+  const [showGithubModal, setShowGithubModal] = useState(false);
 
   // Base configuration state for diffing and targeted reverting
   const [baseConfig, setBaseConfig] = useState<any>(null);
@@ -123,7 +131,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
 
   const showStatus = (text: string, type: 'success' | 'error') => {
     setStatusMessage({ text, type });
-    setTimeout(() => setStatusMessage({ text: '', type: '' }), 4000);
+    setTimeout(() => setStatusMessage({ text: '', type: '' }), 6000);
   };
 
   // Compute detected differences between local session and base config
@@ -308,8 +316,48 @@ const Admin = ({ config, setConfig }: AdminProps) => {
   const handleDiscardAllChanges = () => {
     if (!baseConfig) return;
     if (window.confirm('Discard all local changes and revert back to official repository configuration?')) {
+      localStorage.removeItem('portfolio_config');
+      localStorage.removeItem('portfolio_config_timestamp');
       setLocalConfig(JSON.parse(JSON.stringify(baseConfig)));
+      setConfig(baseConfig);
       showStatus('All modifications discarded. Restored official configuration values.', 'success');
+    }
+  };
+
+  // Direct GitHub API Sync Handler
+  const handleSyncToGitHub = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!githubToken.trim()) {
+      setShowGithubModal(true);
+      return;
+    }
+
+    setIsSyncingGithub(true);
+    showStatus('Connecting to GitHub API and committing changes directly to main branch...', 'success');
+
+    try {
+      localStorage.setItem('github_cms_token', githubToken.trim());
+      localStorage.setItem('github_cms_owner', githubOwner.trim());
+      localStorage.setItem('github_cms_repo', githubRepo.trim());
+      localStorage.setItem('portfolio_config', JSON.stringify(localConfig));
+      setConfig(localConfig);
+
+      await syncToGitHub(
+        githubOwner.trim(),
+        githubRepo.trim(),
+        'public/portfolio-config.json',
+        githubToken.trim(),
+        localConfig,
+        'main'
+      );
+
+      setShowGithubModal(false);
+      showStatus('✅ Successfully committed to GitHub repository! Changes will be live across all mobile phones and laptops worldwide in ~30s.', 'success');
+    } catch (err: any) {
+      console.error('GitHub Sync Error:', err);
+      showStatus(`GitHub Sync Failed: ${err.message || 'Check your token and repo permissions.'}`, 'error');
+    } finally {
+      setIsSyncingGithub(false);
     }
   };
 
@@ -566,7 +614,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
         }
       }
 
-      showStatus('Configuration applied to live preview! (Active for 7 days before auto-reset)', 'success');
+      showStatus('Configuration applied to local preview! (Click "Sync to GitHub" to make live for everyone)', 'success');
     } catch (e) {
       showStatus('Failed to save to browser storage.', 'error');
     }
@@ -706,9 +754,19 @@ const Admin = ({ config, setConfig }: AdminProps) => {
 
         <div className="admin-actions">
           {!isReadOnly && (
-            <button className="btn-action btn-apply" onClick={applyLive}>
-              <Save size={16} /> Apply Live
-            </button>
+            <>
+              <button 
+                className="btn-action btn-github-sync" 
+                onClick={() => handleSyncToGitHub()}
+                disabled={isSyncingGithub}
+                title="Sync and commit directly to GitHub repository (Live for all devices worldwide)"
+              >
+                <FolderGit2 size={16} /> {isSyncingGithub ? 'Syncing...' : 'Sync to GitHub'}
+              </button>
+              <button className="btn-action btn-apply" onClick={applyLive}>
+                <Save size={16} /> Preview Local
+              </button>
+            </>
           )}
           <button className="btn-action btn-export" onClick={exportConfig}>
             <Download size={16} /> Export JSON
@@ -720,6 +778,76 @@ const Admin = ({ config, setConfig }: AdminProps) => {
           )}
         </div>
       </header>
+
+      {/* GitHub Sync Modal */}
+      {showGithubModal && (
+        <div className="modal-overlay">
+          <div className="modal-card glass-panel">
+            <div className="modal-header">
+              <div className="modal-title">
+                <FolderGit2 size={22} className="modal-icon" style={{ color: 'var(--accent-cyan)' }} />
+                <h4>1-Click GitHub Repository Sync</h4>
+              </div>
+              <button className="btn-close-modal" onClick={() => setShowGithubModal(false)}>
+                <X size={16} />
+              </button>
+            </div>
+            
+            <p className="modal-desc">
+              Connect your GitHub Personal Access Token (PAT) to commit changes directly from your phone or browser to your repository. Once committed, GitHub Pages deploys live to all devices worldwide automatically!
+            </p>
+
+            <form onSubmit={handleSyncToGitHub} className="github-modal-form">
+              <div className="form-group-row">
+                <div className="form-group">
+                  <label>GitHub Username / Owner</label>
+                  <input 
+                    type="text" 
+                    value={githubOwner} 
+                    onChange={(e) => setGithubOwner(e.target.value)}
+                    placeholder="e.g. Abhi787145"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Repository Name</label>
+                  <input 
+                    type="text" 
+                    value={githubRepo} 
+                    onChange={(e) => setGithubRepo(e.target.value)}
+                    placeholder="e.g. devops-portfolio"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>GitHub Personal Access Token (PAT)</label>
+                <input 
+                  type="password" 
+                  value={githubToken} 
+                  onChange={(e) => setGithubToken(e.target.value)}
+                  placeholder="github_pat_... or ghp_..."
+                  required
+                  autoFocus
+                />
+                <span className="form-hint" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                  Generate on GitHub: Settings &gt; Developer Settings &gt; Personal Access Tokens (Tokens classic) with <code>repo</code> scope.
+                </span>
+              </div>
+
+              <div className="modal-buttons" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '16px' }}>
+                <button type="button" className="btn-action btn-reset" onClick={() => setShowGithubModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-action btn-github-sync" disabled={isSyncingGithub}>
+                  <FolderGit2 size={16} /> {isSyncingGithub ? 'Committing...' : 'Commit & Sync Live'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {isReadOnly && (
         <div className="status-banner error" style={{ background: 'rgba(59, 130, 246, 0.15)', borderColor: 'rgba(59, 130, 246, 0.3)', color: '#60a5fa' }}>
@@ -926,64 +1054,68 @@ const Admin = ({ config, setConfig }: AdminProps) => {
 
                 <hr className="divider" />
 
-                {/* 1.4 Cloud Sync & Real-Time Phone Sync (Firebase) */}
-                <div className="firebase-sync-section">
+                {/* 1.4 Direct GitHub Sync Settings */}
+                <div className="github-sync-section">
                   <div className="section-title-with-badge">
-                    <h3>Real-Time Cloud Sync (Google Firebase)</h3>
+                    <h3>1-Click GitHub Repository Sync</h3>
                     <span className="theme-active-tag">
-                      {localConfig?.settings?.firebaseConfig?.projectId ? '⚡ Cloud Connected' : '📄 Local Static Mode'}
+                      {githubToken ? '🔗 GitHub Token Ready' : '⚪ Token Not Set'}
                     </span>
                   </div>
                   <p className="section-instruction">
-                    Optional: Connect your free Google Firebase Firestore database to enable real-time global syncing. When connected, any edits made on your mobile phone update live for recruiters on their laptops in 0.1 seconds without git commits. Leave empty to use standard static hosting.
+                    Save your GitHub Personal Access Token to commit changes directly from your phone or browser to your GitHub repository. Once committed, your changes are permanently live for recruiters worldwide.
                   </p>
 
                   <div className="form-group-row">
                     <div className="form-group">
-                      <label>Firebase Project ID</label>
+                      <label>GitHub Owner / Username</label>
                       <input 
                         type="text" 
-                        placeholder="e.g. abhishek-portfolio-12345"
-                        value={localConfig?.settings?.firebaseConfig?.projectId || ''} 
-                        onChange={(e) => handleFirebaseConfigChange('projectId', e.target.value)} 
+                        value={githubOwner} 
+                        onChange={(e) => setGithubOwner(e.target.value)} 
+                        placeholder="Abhi787145"
                       />
                     </div>
                     <div className="form-group">
-                      <label>Firebase API Key</label>
+                      <label>Repository Name</label>
                       <input 
-                        type="password" 
-                        placeholder="AIzaSy..."
-                        value={localConfig?.settings?.firebaseConfig?.apiKey || ''} 
-                        onChange={(e) => handleFirebaseConfigChange('apiKey', e.target.value)} 
+                        type="text" 
+                        value={githubRepo} 
+                        onChange={(e) => setGithubRepo(e.target.value)} 
+                        placeholder="devops-portfolio"
                       />
                     </div>
                   </div>
 
-                  <div className="form-group-row">
-                    <div className="form-group">
-                      <label>Auth Domain (Optional)</label>
-                      <input 
-                        type="text" 
-                        placeholder="e.g. project-id.firebaseapp.com"
-                        value={localConfig?.settings?.firebaseConfig?.authDomain || ''} 
-                        onChange={(e) => handleFirebaseConfigChange('authDomain', e.target.value)} 
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>App ID (Optional)</label>
-                      <input 
-                        type="text" 
-                        placeholder="e.g. 1:123456789:web:abcdef"
-                        value={localConfig?.settings?.firebaseConfig?.appId || ''} 
-                        onChange={(e) => handleFirebaseConfigChange('appId', e.target.value)} 
-                      />
-                    </div>
+                  <div className="form-group">
+                    <label>GitHub Personal Access Token (PAT)</label>
+                    <input 
+                      type="password" 
+                      value={githubToken} 
+                      onChange={(e) => {
+                        setGithubToken(e.target.value);
+                        localStorage.setItem('github_cms_token', e.target.value.trim());
+                      }} 
+                      placeholder="github_pat_... or ghp_..."
+                    />
                   </div>
+
+                  {!isReadOnly && (
+                    <button 
+                      type="button" 
+                      className="btn-action btn-github-sync" 
+                      onClick={() => handleSyncToGitHub()}
+                      disabled={isSyncingGithub}
+                      style={{ marginTop: '8px' }}
+                    >
+                      <FolderGit2 size={16} /> {isSyncingGithub ? 'Committing to GitHub...' : 'Commit & Push Changes to GitHub'}
+                    </button>
+                  )}
                 </div>
 
                 <hr className="divider" />
 
-                {/* 1.4 Layout Re-ordering */}
+                {/* 1.5 Layout Re-ordering */}
                 <h3>Layout Section Alignment & Order</h3>
                 <p className="section-instruction">
                   Re-order components using the arrow keys, or check/uncheck to hide sections from rendering on the live page.
