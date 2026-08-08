@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, Save, Download, RotateCcw, Plus, Trash2, ArrowUp, ArrowDown,
   User, Cpu, Briefcase, FolderGit2, ShieldCheck, Check, AlertCircle,
-  Palette, Tag, History, Undo2, RefreshCw, GitCompare, Sparkles, X
+  Palette, Tag, History, Undo2, RefreshCw, GitCompare, Sparkles, X, Cloud, CloudRain
 } from 'lucide-react';
+import { saveRemotePortfolio } from '../services/firebase';
 import './styles/Admin.css';
 
 type AdminProps = {
@@ -342,6 +342,22 @@ const Admin = ({ config, setConfig }: AdminProps) => {
     }));
   };
 
+  const handleFirebaseConfigChange = (field: string, val: string) => {
+    const current = localConfig?.settings?.firebaseConfig || {};
+    const updated = { ...current, [field]: val };
+    if (!updated.projectId?.trim() && !updated.apiKey?.trim()) {
+      setLocalConfig((prev: any) => ({
+        ...prev,
+        settings: { ...prev.settings, firebaseConfig: null }
+      }));
+    } else {
+      setLocalConfig((prev: any) => ({
+        ...prev,
+        settings: { ...prev.settings, firebaseConfig: updated }
+      }));
+    }
+  };
+
   // Rotating Titles handlers
   const handleAddTitle = (e: React.FormEvent) => {
     e.preventDefault();
@@ -528,11 +544,27 @@ const Admin = ({ config, setConfig }: AdminProps) => {
   };
 
   // Global actions
-  const applyLive = () => {
+  const applyLive = async () => {
     try {
       localStorage.setItem('portfolio_config', JSON.stringify(localConfig));
       localStorage.setItem('portfolio_config_timestamp', Date.now().toString());
       setConfig(localConfig);
+
+      // If Firebase Cloud Sync is configured, write directly to Cloud Firestore!
+      const fbConfig = localConfig?.settings?.firebaseConfig;
+      if (fbConfig && fbConfig.projectId && fbConfig.apiKey) {
+        showStatus('Syncing changes to Google Cloud Firestore...', 'success');
+        try {
+          await saveRemotePortfolio(fbConfig, localConfig);
+          showStatus('Live changes synced to Cloud Firestore! Visible globally on all devices in real-time.', 'success');
+          return;
+        } catch (fbErr) {
+          console.error('Firebase save error:', fbErr);
+          showStatus('Saved locally. (Cloud sync error: check Firebase API keys or Firestore rules)', 'error');
+          return;
+        }
+      }
+
       showStatus('Configuration applied to live preview! (Active for 7 days before auto-reset)', 'success');
     } catch (e) {
       showStatus('Failed to save to browser storage.', 'error');
@@ -888,6 +920,63 @@ const Admin = ({ config, setConfig }: AdminProps) => {
                       value={localConfig.profile.github} 
                       onChange={(e) => handleProfileChange('github', e.target.value)} 
                     />
+                  </div>
+                </div>
+
+                <hr className="divider" />
+
+                {/* 1.4 Cloud Sync & Real-Time Phone Sync (Firebase) */}
+                <div className="firebase-sync-section">
+                  <div className="section-title-with-badge">
+                    <h3>Real-Time Cloud Sync (Google Firebase)</h3>
+                    <span className="theme-active-tag">
+                      {localConfig?.settings?.firebaseConfig?.projectId ? '⚡ Cloud Connected' : '📄 Local Static Mode'}
+                    </span>
+                  </div>
+                  <p className="section-instruction">
+                    Optional: Connect your free Google Firebase Firestore database to enable real-time global syncing. When connected, any edits made on your mobile phone update live for recruiters on their laptops in 0.1 seconds without git commits. Leave empty to use standard static hosting.
+                  </p>
+
+                  <div className="form-group-row">
+                    <div className="form-group">
+                      <label>Firebase Project ID</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. abhishek-portfolio-12345"
+                        value={localConfig?.settings?.firebaseConfig?.projectId || ''} 
+                        onChange={(e) => handleFirebaseConfigChange('projectId', e.target.value)} 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Firebase API Key</label>
+                      <input 
+                        type="password" 
+                        placeholder="AIzaSy..."
+                        value={localConfig?.settings?.firebaseConfig?.apiKey || ''} 
+                        onChange={(e) => handleFirebaseConfigChange('apiKey', e.target.value)} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group-row">
+                    <div className="form-group">
+                      <label>Auth Domain (Optional)</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. project-id.firebaseapp.com"
+                        value={localConfig?.settings?.firebaseConfig?.authDomain || ''} 
+                        onChange={(e) => handleFirebaseConfigChange('authDomain', e.target.value)} 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>App ID (Optional)</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. 1:123456789:web:abcdef"
+                        value={localConfig?.settings?.firebaseConfig?.appId || ''} 
+                        onChange={(e) => handleFirebaseConfigChange('appId', e.target.value)} 
+                      />
+                    </div>
                   </div>
                 </div>
 

@@ -38,9 +38,9 @@ const initialConfig = {
   certifications: []
 };
 
-function App() {
+const App = () => {
   const [currentRoute, setCurrentRoute] = useState(window.location.hash || '#/');
-  const [config, setConfig] = useState<any>(initialConfig);
+  const [config, setConfig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,12 +60,37 @@ function App() {
 
   useEffect(() => {
     const loadConfig = async () => {
+      let baseData: any = null;
+      try {
+        const response = await fetch('./portfolio-config.json');
+        if (response.ok) {
+          baseData = await response.json();
+        }
+      } catch (e) {
+        console.error('Failed to fetch default config:', e);
+      }
+
+      // Check if Cloud Firestore database is configured for real-time global sync
+      const fbConfig = baseData?.settings?.firebaseConfig;
+      if (fbConfig && fbConfig.projectId && fbConfig.apiKey) {
+        try {
+          const remoteData = await fetchRemotePortfolio(fbConfig);
+          if (remoteData) {
+            setConfig(remoteData);
+            setLoading(false);
+            return;
+          }
+        } catch (err) {
+          console.warn('[Firebase] Remote fetch failed, falling back to local storage/config:', err);
+        }
+      }
+
+      // Fallback to local storage (verifying 7-day retention)
       try {
         const saved = localStorage.getItem('portfolio_config');
         const savedTimestamp = localStorage.getItem('portfolio_config_timestamp');
         
         if (saved) {
-          // Check if changes are older than 7 days (7 * 24 * 60 * 60 * 1000 ms)
           const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
           if (savedTimestamp && Date.now() - Number(savedTimestamp) > ONE_WEEK_MS) {
             console.log('[Retention] Local changes expired (>7 days old). Restoring clean repository config.');
@@ -81,14 +106,10 @@ function App() {
         console.error('Failed to read from localStorage:', e);
       }
 
-      try {
-        const response = await fetch('./portfolio-config.json');
-        if (response.ok) {
-          const data = await response.json();
-          setConfig(data);
-        }
-      } catch (e) {
-        console.error('Failed to fetch default config:', e);
+      if (baseData) {
+        setConfig(baseData);
+      } else {
+        setConfig(initialConfig);
       }
       setLoading(false);
     };

@@ -62,4 +62,14 @@ You can customize your portfolio in **two easy ways**:
 
 ---
 
+## ⚡ Optional: Real-Time Phone Cloud Sync (Google Firebase)
+Want to edit your portfolio from your mobile phone and have changes update live for recruiters in 0.1 seconds?
+1. Create a free project at [Firebase Console](https://console.firebase.google.com/).
+2. Enable **Firestore Database** in test mode.
+3. Copy your Web App config keys (Project ID & API Key).
+4. Enter them into the **Cloud Sync** panel in `#/admin` (or paste into `portfolio-config.json`).
+5. Now, any edit you save on your mobile phone is permanently live for anyone visiting your website worldwide!
+
+---
+
 **Need Help?** Enjoy your portfolio!
