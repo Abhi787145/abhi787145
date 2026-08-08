@@ -531,8 +531,9 @@ const Admin = ({ config, setConfig }: AdminProps) => {
   const applyLive = () => {
     try {
       localStorage.setItem('portfolio_config', JSON.stringify(localConfig));
+      localStorage.setItem('portfolio_config_timestamp', Date.now().toString());
       setConfig(localConfig);
-      showStatus('Configuration applied to live preview! Head back to the homepage to see changes.', 'success');
+      showStatus('Configuration applied to live preview! (Active for 7 days before auto-reset)', 'success');
     } catch (e) {
       showStatus('Failed to save to browser storage.', 'error');
     }
@@ -556,6 +557,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
   const resetConfig = async () => {
     if (window.confirm('Reset all changes and reload base repository config?')) {
       localStorage.removeItem('portfolio_config');
+      localStorage.removeItem('portfolio_config_timestamp');
       try {
         const response = await fetch('./portfolio-config.json');
         if (response.ok) {
@@ -1221,9 +1223,12 @@ const Admin = ({ config, setConfig }: AdminProps) => {
               <div className="tab-pane">
                 <div className="changes-header-bar">
                   <div>
-                    <h3>Changes Tracker & Diff Inspector</h3>
+                    <div className="section-title-with-badge">
+                      <h3>Changes Tracker & Diff Inspector</h3>
+                      <span className="theme-active-tag">7-Day Auto-Retention</span>
+                    </div>
                     <p className="section-instruction">
-                      Inspect all modifications made in your active browser session compared against the official repository file.
+                      Inspect all modifications made in your active browser session compared against the official repository file. Edits automatically expire after 7 days to preserve performance and prevent stale storage.
                     </p>
                   </div>
 

@@ -62,10 +62,20 @@ function App() {
     const loadConfig = async () => {
       try {
         const saved = localStorage.getItem('portfolio_config');
+        const savedTimestamp = localStorage.getItem('portfolio_config_timestamp');
+        
         if (saved) {
-          setConfig(JSON.parse(saved));
-          setLoading(false);
-          return;
+          // Check if changes are older than 7 days (7 * 24 * 60 * 60 * 1000 ms)
+          const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+          if (savedTimestamp && Date.now() - Number(savedTimestamp) > ONE_WEEK_MS) {
+            console.log('[Retention] Local changes expired (>7 days old). Restoring clean repository config.');
+            localStorage.removeItem('portfolio_config');
+            localStorage.removeItem('portfolio_config_timestamp');
+          } else {
+            setConfig(JSON.parse(saved));
+            setLoading(false);
+            return;
+          }
         }
       } catch (e) {
         console.error('Failed to read from localStorage:', e);
