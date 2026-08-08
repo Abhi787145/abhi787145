@@ -133,7 +133,7 @@ const App = () => {
     );
   }
 
-  if (currentRoute === '#/admin') {
+  if (currentRoute === '#/admin' || currentRoute === '#admin') {
     return <Admin config={config} setConfig={setConfig} />;
   }
 

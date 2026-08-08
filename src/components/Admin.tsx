@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, Save, Download, RotateCcw, Plus, Trash2, ArrowUp, ArrowDown,
   User, Cpu, Briefcase, FolderGit2, ShieldCheck, Check, AlertCircle,
