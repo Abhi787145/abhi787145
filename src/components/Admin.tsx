@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, Save, Download, RotateCcw, Plus, Trash2, ArrowUp, ArrowDown,
   User, Cpu, Briefcase, FolderGit2, ShieldCheck, Check, AlertCircle,
-  Palette, Tag, History, Undo2, RefreshCw, GitCompare, Sparkles, X, Cloud, CloudRain
+  Palette, Tag, History, Undo2, RefreshCw, GitCompare, Sparkles, X, Send
 } from 'lucide-react';
-import { saveRemotePortfolio } from '../services/firebase';
 import { syncToGitHub } from '../services/githubSync';
 import './styles/Admin.css';
 
@@ -52,11 +51,10 @@ const TITLE_PRESETS: Record<string, string[]> = {
 };
 
 const Admin = ({ config, setConfig }: AdminProps) => {
-  const [authRole, setAuthRole] = useState<'admin' | 'viewer' | null>(() => {
-    return sessionStorage.getItem('admin_auth_role') as 'admin' | 'viewer' | null;
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem('admin_authenticated') === 'true';
   });
   const [passcode, setPasscode] = useState('');
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'viewer'>('viewer');
   const [loginError, setLoginError] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -64,7 +62,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
   const [githubToken, setGithubToken] = useState(() => localStorage.getItem('github_cms_token') || '');
   const [githubOwner, setGithubOwner] = useState(() => localStorage.getItem('github_cms_owner') || 'Abhi787145');
   const [githubRepo, setGithubRepo] = useState(() => localStorage.getItem('github_cms_repo') || 'devops-portfolio');
-  const [isSyncingGithub, setIsSyncingGithub] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [showGithubModal, setShowGithubModal] = useState(false);
 
   // Base configuration state for diffing and targeted reverting
@@ -103,20 +101,13 @@ const Admin = ({ config, setConfig }: AdminProps) => {
     setIsAuthenticating(true);
 
     try {
-      if (selectedRole === 'viewer') {
+      const hashed = await sha256(passcode);
+      const adminHash = config?.settings?.adminHash || '9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e';
+      if (hashed === adminHash) {
         sessionStorage.setItem('admin_authenticated', 'true');
-        sessionStorage.setItem('admin_auth_role', 'viewer');
-        setAuthRole('viewer');
+        setIsAuthenticated(true);
       } else {
-        const hashed = await sha256(passcode);
-        const adminHash = config?.settings?.adminHash || '9bf18b507b74f26b64c36b4d3205af08b70e5ac0826399432561a3c8c4ddb55e';
-        if (hashed === adminHash) {
-          sessionStorage.setItem('admin_authenticated', 'true');
-          sessionStorage.setItem('admin_auth_role', 'admin');
-          setAuthRole('admin');
-        } else {
-          setLoginError('Access Denied: Invalid Decryption Key');
-        }
+        setLoginError('Access Denied: Invalid Decryption Key');
       }
     } catch (err) {
       setLoginError('Authentication engine error. Please try again.');
@@ -124,10 +115,6 @@ const Admin = ({ config, setConfig }: AdminProps) => {
       setIsAuthenticating(false);
     }
   };
-
-  const isAuthorized = authRole !== null;
-  const isReadOnly = authRole === 'viewer';
-  const showGuestOption = config?.settings?.enableGuestViewer !== false;
 
   const showStatus = (text: string, type: 'success' | 'error') => {
     setStatusMessage({ text, type });
@@ -324,23 +311,28 @@ const Admin = ({ config, setConfig }: AdminProps) => {
     }
   };
 
-  // Direct GitHub API Sync Handler
-  const handleSyncToGitHub = async (e?: React.FormEvent) => {
+  // Primary: 1-Click Save & Publish Live Globally
+  const handleSaveAndPublishGlobally = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    
+    // Save locally first for instant feedback
+    localStorage.setItem('portfolio_config', JSON.stringify(localConfig));
+    localStorage.setItem('portfolio_config_timestamp', Date.now().toString());
+    setConfig(localConfig);
+
+    // If GitHub token is not present, open token modal once
     if (!githubToken.trim()) {
       setShowGithubModal(true);
       return;
     }
 
-    setIsSyncingGithub(true);
-    showStatus('Connecting to GitHub API and committing changes directly to main branch...', 'success');
+    setIsPublishing(true);
+    showStatus('🚀 Publishing changes directly to GitHub repository...', 'success');
 
     try {
       localStorage.setItem('github_cms_token', githubToken.trim());
       localStorage.setItem('github_cms_owner', githubOwner.trim());
       localStorage.setItem('github_cms_repo', githubRepo.trim());
-      localStorage.setItem('portfolio_config', JSON.stringify(localConfig));
-      setConfig(localConfig);
 
       await syncToGitHub(
         githubOwner.trim(),
@@ -352,12 +344,12 @@ const Admin = ({ config, setConfig }: AdminProps) => {
       );
 
       setShowGithubModal(false);
-      showStatus('✅ Successfully committed to GitHub repository! Changes will be live across all mobile phones and laptops worldwide in ~30s.', 'success');
+      showStatus('✅ Permanent Global Publish Complete! Changes are live worldwide on all phones & laptops.', 'success');
     } catch (err: any) {
-      console.error('GitHub Sync Error:', err);
-      showStatus(`GitHub Sync Failed: ${err.message || 'Check your token and repo permissions.'}`, 'error');
+      console.error('Publish Error:', err);
+      showStatus(`Publish Error: ${err.message || 'Check your token and repo permissions.'}`, 'error');
     } finally {
-      setIsSyncingGithub(false);
+      setIsPublishing(false);
     }
   };
 
@@ -389,22 +381,6 @@ const Admin = ({ config, setConfig }: AdminProps) => {
       ...prev,
       profile: { ...prev.profile, [field]: val }
     }));
-  };
-
-  const handleFirebaseConfigChange = (field: string, val: string) => {
-    const current = localConfig?.settings?.firebaseConfig || {};
-    const updated = { ...current, [field]: val };
-    if (!updated.projectId?.trim() && !updated.apiKey?.trim()) {
-      setLocalConfig((prev: any) => ({
-        ...prev,
-        settings: { ...prev.settings, firebaseConfig: null }
-      }));
-    } else {
-      setLocalConfig((prev: any) => ({
-        ...prev,
-        settings: { ...prev.settings, firebaseConfig: updated }
-      }));
-    }
   };
 
   // Rotating Titles handlers
@@ -592,34 +568,6 @@ const Admin = ({ config, setConfig }: AdminProps) => {
     }));
   };
 
-  // Global actions
-  const applyLive = async () => {
-    try {
-      localStorage.setItem('portfolio_config', JSON.stringify(localConfig));
-      localStorage.setItem('portfolio_config_timestamp', Date.now().toString());
-      setConfig(localConfig);
-
-      // If Firebase Cloud Sync is configured, write directly to Cloud Firestore!
-      const fbConfig = localConfig?.settings?.firebaseConfig;
-      if (fbConfig && fbConfig.projectId && fbConfig.apiKey) {
-        showStatus('Syncing changes to Google Cloud Firestore...', 'success');
-        try {
-          await saveRemotePortfolio(fbConfig, localConfig);
-          showStatus('Live changes synced to Cloud Firestore! Visible globally on all devices in real-time.', 'success');
-          return;
-        } catch (fbErr) {
-          console.error('Firebase save error:', fbErr);
-          showStatus('Saved locally. (Cloud sync error: check Firebase API keys or Firestore rules)', 'error');
-          return;
-        }
-      }
-
-      showStatus('Configuration applied to local preview! (Click "Sync to GitHub" to make live for everyone)', 'success');
-    } catch (e) {
-      showStatus('Failed to save to browser storage.', 'error');
-    }
-  };
-
   const exportConfig = () => {
     try {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localConfig, null, 2));
@@ -655,61 +603,29 @@ const Admin = ({ config, setConfig }: AdminProps) => {
   };
 
   // Render Login Screen if not authorized
-  if (!isAuthorized) {
+  if (!isAuthenticated) {
     return (
       <div className="admin-login-container">
         <div className="grid-bg"></div>
         <div className="login-card glass-panel">
           <div className="login-header">
             <ShieldCheck size={36} className="login-icon" />
-            <h3>CloudOps Encryption Gate</h3>
-            <span className="console-prefix">visitor-dev-environment // authentication required</span>
+            <h3>CloudOps Administrative Gate</h3>
+            <span className="console-prefix">abhishek-sharma // enter administrative passcode</span>
           </div>
 
-          {showGuestOption && (
-            <div className="role-selector-bar">
-              <button 
-                type="button" 
-                className={`role-tab ${selectedRole === 'viewer' ? 'active' : ''}`}
-                onClick={() => { setSelectedRole('viewer'); setLoginError(''); }}
-              >
-                Guest Viewer
-              </button>
-              <button 
-                type="button" 
-                className={`role-tab ${selectedRole === 'admin' ? 'active' : ''}`}
-                onClick={() => { setSelectedRole('admin'); setLoginError(''); }}
-              >
-                Administrator
-              </button>
-            </div>
-          )}
-
           <form onSubmit={handleLoginSubmit} className="login-form">
-            {(!showGuestOption || selectedRole === 'admin') ? (
-              <div className="form-group" style={{ marginBottom: '16px' }}>
-                <label>Enter Admin Passcode</label>
-                <input 
-                  type="password" 
-                  placeholder="••••••••••••"
-                  value={passcode} 
-                  onChange={(e) => setPasscode(e.target.value)} 
-                  disabled={isAuthenticating}
-                  autoFocus
-                />
-              </div>
-            ) : (
-              <p className="login-guest-info" style={{
-                fontSize: '0.8rem',
-                color: 'var(--text-secondary)',
-                fontFamily: 'monospace',
-                textAlign: 'center',
-                lineHeight: '1.4',
-                marginBottom: '8px'
-              }}>
-                Authenticate with read-only access to browse layout configuration matrices, timelines, and credentials lists.
-              </p>
-            )}
+            <div className="form-group" style={{ marginBottom: '16px' }}>
+              <label>Admin Security Passcode</label>
+              <input 
+                type="password" 
+                placeholder="••••••••••••"
+                value={passcode} 
+                onChange={(e) => setPasscode(e.target.value)} 
+                disabled={isAuthenticating}
+                autoFocus
+              />
+            </div>
             
             {loginError && (
               <div className="login-error-message">
@@ -719,7 +635,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
             )}
 
             <button type="submit" className="btn-action btn-apply btn-login-submit" disabled={isAuthenticating} style={{ width: '100%', justifyContent: 'center' }}>
-              {isAuthenticating ? 'Decrypting...' : (!showGuestOption || selectedRole === 'admin') ? 'Decrypt Access' : 'Login as Viewer'}
+              {isAuthenticating ? 'Decrypting Access...' : 'Unlock Administrative Console'}
             </button>
           </form>
 
@@ -732,50 +648,36 @@ const Admin = ({ config, setConfig }: AdminProps) => {
   }
 
   return (
-    <div className={`admin-dashboard-container ${isReadOnly ? 'read-only' : ''}`}>
+    <div className="admin-dashboard-container">
       <header className="admin-header">
         <div className="admin-header-left">
           <a href="#/" className="btn-back" onClick={() => {
             sessionStorage.removeItem('admin_authenticated');
-            sessionStorage.removeItem('admin_auth_role');
-            setAuthRole(null);
+            setIsAuthenticated(false);
           }}>
             <ArrowLeft size={16} /> Portfolio Home
           </a>
           <div className="admin-title-group">
             <h2>CloudOps CMS Console</h2>
-            <span className="console-prefix">
-              {isReadOnly 
-                ? 'visitor-dev-environment // read-only session' 
-                : 'visitor-dev-environment // write-access active'}
-            </span>
+            <span className="console-prefix">administrator session // write-access active</span>
           </div>
         </div>
 
         <div className="admin-actions">
-          {!isReadOnly && (
-            <>
-              <button 
-                className="btn-action btn-github-sync" 
-                onClick={() => handleSyncToGitHub()}
-                disabled={isSyncingGithub}
-                title="Sync and commit directly to GitHub repository (Live for all devices worldwide)"
-              >
-                <FolderGit2 size={16} /> {isSyncingGithub ? 'Syncing...' : 'Sync to GitHub'}
-              </button>
-              <button className="btn-action btn-apply" onClick={applyLive}>
-                <Save size={16} /> Preview Local
-              </button>
-            </>
-          )}
+          <button 
+            className="btn-action btn-github-sync" 
+            onClick={() => handleSaveAndPublishGlobally()}
+            disabled={isPublishing}
+            title="Save and publish permanently to GitHub (Live for all devices worldwide)"
+          >
+            <Send size={16} /> {isPublishing ? 'Publishing Globally...' : 'Save & Publish Live'}
+          </button>
           <button className="btn-action btn-export" onClick={exportConfig}>
             <Download size={16} /> Export JSON
           </button>
-          {!isReadOnly && (
-            <button className="btn-action btn-reset" onClick={resetConfig}>
-              <RotateCcw size={16} /> Reset defaults
-            </button>
-          )}
+          <button className="btn-action btn-reset" onClick={resetConfig}>
+            <RotateCcw size={16} /> Reset defaults
+          </button>
         </div>
       </header>
 
@@ -786,7 +688,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
             <div className="modal-header">
               <div className="modal-title">
                 <FolderGit2 size={22} className="modal-icon" style={{ color: 'var(--accent-cyan)' }} />
-                <h4>1-Click GitHub Repository Sync</h4>
+                <h4>Connect GitHub for 1-Click Publishing</h4>
               </div>
               <button className="btn-close-modal" onClick={() => setShowGithubModal(false)}>
                 <X size={16} />
@@ -794,17 +696,17 @@ const Admin = ({ config, setConfig }: AdminProps) => {
             </div>
             
             <p className="modal-desc">
-              Connect your GitHub Personal Access Token (PAT) to commit changes directly from your phone or browser to your repository. Once committed, GitHub Pages deploys live to all devices worldwide automatically!
+              Enter your GitHub Personal Access Token (PAT) once. The console will save it in your browser and automatically commit your updates to GitHub so changes reflect permanently across all phones and laptops worldwide.
             </p>
 
-            <form onSubmit={handleSyncToGitHub} className="github-modal-form">
+            <form onSubmit={handleSaveAndPublishGlobally} className="github-modal-form">
               <div className="form-group-row">
                 <div className="form-group">
                   <label>GitHub Username / Owner</label>
                   <input 
                     type="text" 
                     value={githubOwner} 
-                    onChange={(e) => setGithubOwner(e.target.value)}
+                    onChange={(e) => setGithubOwner(e.target.value)} 
                     placeholder="e.g. Abhi787145"
                     required
                   />
@@ -814,7 +716,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
                   <input 
                     type="text" 
                     value={githubRepo} 
-                    onChange={(e) => setGithubRepo(e.target.value)}
+                    onChange={(e) => setGithubRepo(e.target.value)} 
                     placeholder="e.g. devops-portfolio"
                     required
                   />
@@ -826,7 +728,7 @@ const Admin = ({ config, setConfig }: AdminProps) => {
                 <input 
                   type="password" 
                   value={githubToken} 
-                  onChange={(e) => setGithubToken(e.target.value)}
+                  onChange={(e) => setGithubToken(e.target.value)} 
                   placeholder="github_pat_... or ghp_..."
                   required
                   autoFocus
@@ -840,19 +742,12 @@ const Admin = ({ config, setConfig }: AdminProps) => {
                 <button type="button" className="btn-action btn-reset" onClick={() => setShowGithubModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-action btn-github-sync" disabled={isSyncingGithub}>
-                  <FolderGit2 size={16} /> {isSyncingGithub ? 'Committing...' : 'Commit & Sync Live'}
+                <button type="submit" className="btn-action btn-github-sync" disabled={isPublishing}>
+                  <Send size={16} /> {isPublishing ? 'Publishing...' : 'Save & Publish Now'}
                 </button>
               </div>
             </form>
           </div>
-        </div>
-      )}
-
-      {isReadOnly && (
-        <div className="status-banner error" style={{ background: 'rgba(59, 130, 246, 0.15)', borderColor: 'rgba(59, 130, 246, 0.3)', color: '#60a5fa' }}>
-          <AlertCircle size={18} style={{ color: '#60a5fa' }} />
-          <span>READ-ONLY VIEW: You are logged in as a guest viewer. Edits and saves are disabled.</span>
         </div>
       )}
 
@@ -902,612 +797,590 @@ const Admin = ({ config, setConfig }: AdminProps) => {
         </aside>
 
         <main className="admin-main">
-          <fieldset disabled={isReadOnly} style={{ border: 'none', padding: 0, margin: 0, width: '100%' }}>
-            
-            {/* TAB 1: PROFILE & AESTHETICS */}
-            {activeTab === 'profile' && (
-              <div className="tab-pane">
-                {/* 1.1 Cyberpunk Theme Selector */}
-                <div className="theme-selector-section">
-                  <div className="section-title-with-badge">
-                    <h3>Cyberpunk Color Themes</h3>
-                    <span className="theme-active-tag">Active: {localConfig.theme || 'cyber-cyan'}</span>
-                  </div>
-                  <p className="section-instruction">
-                    Select a curated cyberpunk theme palette to dynamically customize accent colors and glows across the whole portfolio.
-                  </p>
-                  
-                  <div className="themes-grid">
-                    {AVAILABLE_THEMES.map((th) => {
-                      const isSelected = (localConfig.theme || 'cyber-cyan') === th.id;
-                      return (
-                        <div 
-                          key={th.id}
-                          className={`theme-card ${isSelected ? 'selected' : ''}`}
-                          onClick={() => !isReadOnly && setLocalConfig((p: any) => ({ ...p, theme: th.id }))}
-                        >
-                          <div className="theme-card-top">
-                            <span className="theme-color-dot" style={{ background: th.color, boxShadow: `0 0 10px ${th.color}` }}></span>
-                            <span className="theme-name">{th.name}</span>
-                          </div>
-                          <span className="theme-desc">{th.desc}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
+          {/* TAB 1: PROFILE & AESTHETICS */}
+          {activeTab === 'profile' && (
+            <div className="tab-pane">
+              {/* 1.1 Cyberpunk Theme Selector */}
+              <div className="theme-selector-section">
+                <div className="section-title-with-badge">
+                  <h3>Cyberpunk Color Themes</h3>
+                  <span className="theme-active-tag">Active: {localConfig.theme || 'cyber-cyan'}</span>
                 </div>
-
-                <hr className="divider" />
-
-                {/* 1.2 Rotating Titles Tag Editor */}
-                <div className="titles-editor-section">
-                  <div className="section-title-with-badge">
-                    <h3>Universal Position Titles</h3>
-                    <span className="theme-active-tag">Landing Subtitle Typewriter</span>
-                  </div>
-                  <p className="section-instruction">
-                    Pick a 1-click preset or add custom job position titles to rotate under your name on the landing hero section.
-                  </p>
-
-                  <div className="preset-buttons-bar">
-                    <span className="preset-label">Presets:</span>
-                    <button type="button" className="btn-preset" onClick={() => handleApplyPreset('devops')}>DevOps & Cloud</button>
-                    <button type="button" className="btn-preset" onClick={() => handleApplyPreset('fullstack')}>Full Stack Dev</button>
-                    <button type="button" className="btn-preset" onClick={() => handleApplyPreset('ai_data')}>Data & AI/ML</button>
-                    <button type="button" className="btn-preset" onClick={() => handleApplyPreset('security')}>Cyber Security</button>
-                  </div>
-
-                  <div className="titles-tags-list">
-                    {(localConfig.titles || []).map((title: string, tIdx: number) => (
-                      <span className="title-tag-chip" key={tIdx}>
-                        {title}
-                        {!isReadOnly && (
-                          <button type="button" className="btn-remove-tag" onClick={() => handleRemoveTitle(title)}>
-                            <X size={12} />
-                          </button>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-
-                  {!isReadOnly && (
-                    <form onSubmit={handleAddTitle} className="add-title-form">
-                      <input 
-                        type="text" 
-                        placeholder="Add custom position title (e.g. Senior Site Reliability Engineer)..."
-                        value={newTitleInput}
-                        onChange={(e) => setNewTitleInput(e.target.value)}
-                      />
-                      <button type="submit" className="btn-add-tag-submit">
-                        <Plus size={14} /> Add Title
-                      </button>
-                    </form>
-                  )}
-                </div>
-
-                <hr className="divider" />
-
-                {/* 1.3 Profile Information */}
-                <h3>Profile Settings</h3>
-                <div className="form-group-row">
-                  <div className="form-group">
-                    <label>Full Name</label>
-                    <input 
-                      type="text" 
-                      value={localConfig.profile.name} 
-                      onChange={(e) => handleProfileChange('name', e.target.value)} 
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Job Title/Role</label>
-                    <input 
-                      type="text" 
-                      value={localConfig.profile.role} 
-                      onChange={(e) => handleProfileChange('role', e.target.value)} 
-                    />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Profile Summary / Bio</label>
-                  <textarea 
-                    rows={4}
-                    value={localConfig.profile.summary} 
-                    onChange={(e) => handleProfileChange('summary', e.target.value)} 
-                  />
-                </div>
-
-                <div className="form-group-row">
-                  <div className="form-group">
-                    <label>Contact Email</label>
-                    <input 
-                      type="email" 
-                      value={localConfig.profile.email} 
-                      onChange={(e) => handleProfileChange('email', e.target.value)} 
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Formspree Form ID</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. mqazkypq"
-                      value={localConfig.profile.formspreeId || ''} 
-                      onChange={(e) => handleProfileChange('formspreeId', e.target.value)} 
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>LinkedIn URL</label>
-                    <input 
-                      type="text" 
-                      value={localConfig.profile.linkedin} 
-                      onChange={(e) => handleProfileChange('linkedin', e.target.value)} 
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>GitHub Profile URL</label>
-                    <input 
-                      type="text" 
-                      value={localConfig.profile.github} 
-                      onChange={(e) => handleProfileChange('github', e.target.value)} 
-                    />
-                  </div>
-                </div>
-
-                <hr className="divider" />
-
-                {/* 1.4 Direct GitHub Sync Settings */}
-                <div className="github-sync-section">
-                  <div className="section-title-with-badge">
-                    <h3>1-Click GitHub Repository Sync</h3>
-                    <span className="theme-active-tag">
-                      {githubToken ? '🔗 GitHub Token Ready' : '⚪ Token Not Set'}
-                    </span>
-                  </div>
-                  <p className="section-instruction">
-                    Save your GitHub Personal Access Token to commit changes directly from your phone or browser to your GitHub repository. Once committed, your changes are permanently live for recruiters worldwide.
-                  </p>
-
-                  <div className="form-group-row">
-                    <div className="form-group">
-                      <label>GitHub Owner / Username</label>
-                      <input 
-                        type="text" 
-                        value={githubOwner} 
-                        onChange={(e) => setGithubOwner(e.target.value)} 
-                        placeholder="Abhi787145"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Repository Name</label>
-                      <input 
-                        type="text" 
-                        value={githubRepo} 
-                        onChange={(e) => setGithubRepo(e.target.value)} 
-                        placeholder="devops-portfolio"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>GitHub Personal Access Token (PAT)</label>
-                    <input 
-                      type="password" 
-                      value={githubToken} 
-                      onChange={(e) => {
-                        setGithubToken(e.target.value);
-                        localStorage.setItem('github_cms_token', e.target.value.trim());
-                      }} 
-                      placeholder="github_pat_... or ghp_..."
-                    />
-                  </div>
-
-                  {!isReadOnly && (
-                    <button 
-                      type="button" 
-                      className="btn-action btn-github-sync" 
-                      onClick={() => handleSyncToGitHub()}
-                      disabled={isSyncingGithub}
-                      style={{ marginTop: '8px' }}
-                    >
-                      <FolderGit2 size={16} /> {isSyncingGithub ? 'Committing to GitHub...' : 'Commit & Push Changes to GitHub'}
-                    </button>
-                  )}
-                </div>
-
-                <hr className="divider" />
-
-                {/* 1.5 Layout Re-ordering */}
-                <h3>Layout Section Alignment & Order</h3>
                 <p className="section-instruction">
-                  Re-order components using the arrow keys, or check/uncheck to hide sections from rendering on the live page.
+                  Select a curated cyberpunk theme palette to dynamically customize accent colors and glows across the whole portfolio.
                 </p>
-                <div className="sections-list">
-                  {ALL_AVAILABLE_SECTIONS.map((section) => {
-                    const isVisible = localConfig.sections.includes(section.id);
-                    const activeIndex = localConfig.sections.indexOf(section.id);
-
+                
+                <div className="themes-grid">
+                  {AVAILABLE_THEMES.map((th) => {
+                    const isSelected = (localConfig.theme || 'cyber-cyan') === th.id;
                     return (
-                      <div className={`section-order-row ${isVisible ? 'visible' : 'hidden'}`} key={section.id}>
-                        <div className="section-row-left">
-                          <input 
-                            type="checkbox" 
-                            checked={isVisible} 
-                            onChange={() => toggleSectionVisibility(section.id)} 
-                          />
-                          <span className="section-label">{section.label}</span>
-                          <span className="section-id-tag">#{section.id}</span>
+                      <div 
+                        key={th.id}
+                        className={`theme-card ${isSelected ? 'selected' : ''}`}
+                        onClick={() => setLocalConfig((p: any) => ({ ...p, theme: th.id }))}
+                      >
+                        <div className="theme-card-top">
+                          <span className="theme-color-dot" style={{ background: th.color, boxShadow: `0 0 10px ${th.color}` }}></span>
+                          <span className="theme-name">{th.name}</span>
                         </div>
-                        
-                        {isVisible && (
-                          <div className="section-row-actions">
-                            <button 
-                              className="btn-order-arrow" 
-                              disabled={activeIndex === 0}
-                              onClick={() => moveSection(activeIndex, 'up')}
-                              title="Move section up"
-                            >
-                              <ArrowUp size={14} />
-                            </button>
-                            <button 
-                              className="btn-order-arrow" 
-                              disabled={activeIndex === localConfig.sections.length - 1}
-                              onClick={() => moveSection(activeIndex, 'down')}
-                              title="Move section down"
-                            >
-                              <ArrowDown size={14} />
-                            </button>
-                          </div>
-                        )}
+                        <span className="theme-desc">{th.desc}</span>
                       </div>
                     );
                   })}
                 </div>
               </div>
-            )}
 
-            {/* TAB 2: SKILLS (3D BALLS & CLI) */}
-            {activeTab === 'skills' && (
-              <div className="tab-pane">
-                <div className="header-with-action">
-                  <div>
-                    <h3>3D Interactive Tech Spheres</h3>
-                    <p className="section-instruction">
-                      Add, delete, and customize color schemes for the physics canvas. If a tool icon is missing, text will automatically render on the sphere in 3D.
-                    </p>
-                  </div>
-                  <button className="btn-add-item" onClick={addSkill}>
-                    <Plus size={14} /> Add 3D Ball
-                  </button>
+              <hr className="divider" />
+
+              {/* 1.2 Rotating Titles Tag Editor */}
+              <div className="titles-editor-section">
+                <div className="section-title-with-badge">
+                  <h3>Universal Position Titles</h3>
+                  <span className="theme-active-tag">Landing Subtitle Typewriter</span>
+                </div>
+                <p className="section-instruction">
+                  Pick a 1-click preset or add custom job position titles to rotate under your name on the landing hero section.
+                </p>
+
+                <div className="preset-buttons-bar">
+                  <span className="preset-label">Presets:</span>
+                  <button type="button" className="btn-preset" onClick={() => handleApplyPreset('devops')}>DevOps & Cloud</button>
+                  <button type="button" className="btn-preset" onClick={() => handleApplyPreset('fullstack')}>Full Stack Dev</button>
+                  <button type="button" className="btn-preset" onClick={() => handleApplyPreset('ai_data')}>Data & AI/ML</button>
+                  <button type="button" className="btn-preset" onClick={() => handleApplyPreset('security')}>Cyber Security</button>
                 </div>
 
-                <div className="skills-grid-editor">
-                  {localConfig.skills.map((skill: any, idx: number) => (
-                    <div className="skill-card-editor" key={idx}>
-                      <div className="card-editor-header">
-                        <span>Sphere #{idx + 1}</span>
-                        <button className="btn-delete-card" onClick={() => removeSkill(idx)}>
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-
-                      <div className="form-group">
-                        <label>Tool / Technology Name</label>
-                        <input 
-                          type="text" 
-                          value={skill.name} 
-                          onChange={(e) => handleSkillChange(idx, 'name', e.target.value)} 
-                        />
-                      </div>
-
-                      <div className="form-group">
-                        <label>Sphere Color</label>
-                        <select 
-                          value={skill.bg} 
-                          onChange={(e) => handleSkillChange(idx, 'bg', e.target.value)}
-                        >
-                          {PREDEFINED_COLORS.map(c => (
-                            <option key={c.hex} value={c.hex}>{c.name} ({c.hex})</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <hr className="divider" />
-
-                <div className="header-with-action">
-                  <div>
-                    <h3>CloudOps CLI Output Categories</h3>
-                    <p className="section-instruction">
-                      Configure output categories and items that appear in the interactive terminal console.
-                    </p>
-                  </div>
-                  <button className="btn-add-item" onClick={addCliCategory}>
-                    <Plus size={14} /> Add Category
-                  </button>
-                </div>
-
-                <div className="categories-list-editor">
-                  {Object.entries(localConfig.cliSkills || {}).map(([catName, skillsList]: [string, any], idx: number) => (
-                    <div className="category-row-editor" key={idx}>
-                      <div className="form-group cat-name-group">
-                        <label>Category Label</label>
-                        <input 
-                          type="text" 
-                          defaultValue={catName} 
-                          onBlur={(e) => handleCliCategoryNameChange(catName, e.target.value)} 
-                        />
-                      </div>
-                      <div className="form-group cat-skills-group">
-                        <label>Skills (comma separated)</label>
-                        <input 
-                          type="text" 
-                          value={skillsList.join(', ')} 
-                          onChange={(e) => handleCliSkillsChange(catName, e.target.value)} 
-                        />
-                      </div>
-                      <button className="btn-delete-row" onClick={() => removeCliCategory(catName)}>
-                        <Trash2 size={16} />
+                <div className="titles-tags-list">
+                  {(localConfig.titles || []).map((title: string, tIdx: number) => (
+                    <span className="title-tag-chip" key={tIdx}>
+                      {title}
+                      <button type="button" className="btn-remove-tag" onClick={() => handleRemoveTitle(title)}>
+                        <X size={12} />
                       </button>
-                    </div>
+                    </span>
                   ))}
+                </div>
+
+                <form onSubmit={handleAddTitle} className="add-title-form">
+                  <input 
+                    type="text" 
+                    placeholder="Add custom position title (e.g. Senior Site Reliability Engineer)..."
+                    value={newTitleInput}
+                    onChange={(e) => setNewTitleInput(e.target.value)}
+                  />
+                  <button type="submit" className="btn-add-tag-submit">
+                    <Plus size={14} /> Add Title
+                  </button>
+                </form>
+              </div>
+
+              <hr className="divider" />
+
+              {/* 1.3 Profile Information */}
+              <h3>Profile Settings</h3>
+              <div className="form-group-row">
+                <div className="form-group">
+                  <label>Full Name</label>
+                  <input 
+                    type="text" 
+                    value={localConfig.profile.name} 
+                    onChange={(e) => handleProfileChange('name', e.target.value)} 
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Job Title/Role</label>
+                  <input 
+                    type="text" 
+                    value={localConfig.profile.role} 
+                    onChange={(e) => handleProfileChange('role', e.target.value)} 
+                  />
                 </div>
               </div>
-            )}
+              <div className="form-group">
+                <label>Profile Summary / Bio</label>
+                <textarea 
+                  rows={4}
+                  value={localConfig.profile.summary} 
+                  onChange={(e) => handleProfileChange('summary', e.target.value)} 
+                />
+              </div>
 
-            {/* TAB 3: PROJECTS & CERTS */}
-            {activeTab === 'projects' && (
-              <div className="tab-pane">
-                <div className="header-with-action">
-                  <div>
-                    <h3>Projects Showcase</h3>
-                    <p className="section-instruction">
-                      Manage featured projects, e-commerce dropshipping portals, descriptions, and technology tags.
-                    </p>
-                  </div>
-                  <button className="btn-add-item" onClick={addProject}>
-                    <Plus size={14} /> Add Project
-                  </button>
+              <div className="form-group-row">
+                <div className="form-group">
+                  <label>Contact Email</label>
+                  <input 
+                    type="email" 
+                    value={localConfig.profile.email} 
+                    onChange={(e) => handleProfileChange('email', e.target.value)} 
+                  />
                 </div>
-
-                <div className="projects-list-editor">
-                  {localConfig.projects.map((proj: any, idx: number) => (
-                    <div className="project-card-editor" key={proj.id || idx}>
-                      <div className="card-editor-header">
-                        <span>Project #{idx + 1}: {proj.title}</span>
-                        <button className="btn-delete-card" onClick={() => removeProject(idx)}>
-                          <Trash2 size={14} /> Delete Project
-                        </button>
-                      </div>
-
-                      <div className="form-group-row">
-                        <div className="form-group">
-                          <label>Project Title</label>
-                          <input 
-                            type="text" 
-                            value={proj.title} 
-                            onChange={(e) => handleProjectChange(idx, 'title', e.target.value)} 
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Live URL (e.g. ShopNexa Storefront)</label>
-                          <input 
-                            type="text" 
-                            value={proj.liveUrl} 
-                            onChange={(e) => handleProjectChange(idx, 'liveUrl', e.target.value)} 
-                          />
-                        </div>
-                      </div>
-
-                      <div className="form-group">
-                        <label>Project Description</label>
-                        <textarea 
-                          rows={3} 
-                          value={proj.desc} 
-                          onChange={(e) => handleProjectChange(idx, 'desc', e.target.value)} 
-                        />
-                      </div>
-
-                      <div className="form-group-row">
-                        <div className="form-group">
-                          <label>Tech Stack Tags (comma separated)</label>
-                          <input 
-                            type="text" 
-                            value={proj.tags?.join(', ') || ''} 
-                            onChange={(e) => handleProjectChange(idx, 'tags', e.target.value.split(',').map((s: string) => s.trim()))} 
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Repository / Source URL</label>
-                          <input 
-                            type="text" 
-                            value={proj.repoUrl || ''} 
-                            onChange={(e) => handleProjectChange(idx, 'repoUrl', e.target.value)} 
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <div className="form-group">
+                  <label>Formspree Form ID</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. mqazkypq"
+                    value={localConfig.profile.formspreeId || ''} 
+                    onChange={(e) => handleProfileChange('formspreeId', e.target.value)} 
+                  />
                 </div>
-
-                <hr className="divider" />
-
-                <div className="header-with-action">
-                  <div>
-                    <h3>Certifications & Badges</h3>
-                    <p className="section-instruction">
-                      List your official industry certifications and badges.
-                    </p>
-                  </div>
-                  <button className="btn-add-item" onClick={addCert}>
-                    <Plus size={14} /> Add Certification
-                  </button>
+                <div className="form-group">
+                  <label>LinkedIn URL</label>
+                  <input 
+                    type="text" 
+                    value={localConfig.profile.linkedin} 
+                    onChange={(e) => handleProfileChange('linkedin', e.target.value)} 
+                  />
                 </div>
-
-                <div className="certs-list-editor">
-                  {(localConfig.credentials?.certifications || []).map((cert: string, idx: number) => (
-                    <div className="cert-row-editor" key={idx}>
-                      <input 
-                        type="text" 
-                        value={cert} 
-                        onChange={(e) => handleCertChange(idx, e.target.value)} 
-                      />
-                      <button className="btn-delete-row" onClick={() => removeCert(idx)}>
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ))}
+                <div className="form-group">
+                  <label>GitHub Profile URL</label>
+                  <input 
+                    type="text" 
+                    value={localConfig.profile.github} 
+                    onChange={(e) => handleProfileChange('github', e.target.value)} 
+                  />
                 </div>
               </div>
-            )}
 
-            {/* TAB 4: WORK EXPERIENCE */}
-            {activeTab === 'experience' && (
-              <div className="tab-pane">
-                <div className="header-with-action">
-                  <div>
-                    <h3>Career History Timeline</h3>
-                    <p className="section-instruction">
-                      Manage jobs, contract positions, company names, and responsibility logs.
-                    </p>
+              <hr className="divider" />
+
+              {/* 1.4 Direct GitHub Sync Settings */}
+              <div className="github-sync-section">
+                <div className="section-title-with-badge">
+                  <h3>GitHub Publishing Token</h3>
+                  <span className="theme-active-tag">
+                    {githubToken ? '🔗 Token Configured' : '⚪ Token Not Set'}
+                  </span>
+                </div>
+                <p className="section-instruction">
+                  Your GitHub Personal Access Token is stored securely in your browser so you can publish live updates from your phone or laptop with 1 click.
+                </p>
+
+                <div className="form-group-row">
+                  <div className="form-group">
+                    <label>GitHub Owner / Username</label>
+                    <input 
+                      type="text" 
+                      value={githubOwner} 
+                      onChange={(e) => setGithubOwner(e.target.value)} 
+                      placeholder="Abhi787145"
+                    />
                   </div>
-                  <button className="btn-add-item" onClick={addJob}>
-                    <Plus size={14} /> Add Job Role
-                  </button>
+                  <div className="form-group">
+                    <label>Repository Name</label>
+                    <input 
+                      type="text" 
+                      value={githubRepo} 
+                      onChange={(e) => setGithubRepo(e.target.value)} 
+                      placeholder="devops-portfolio"
+                    />
+                  </div>
                 </div>
 
-                <div className="jobs-list-editor">
-                  {localConfig.experience.map((job: any, jobIdx: number) => (
-                    <div className="job-card-editor" key={jobIdx}>
-                      <div className="card-editor-header">
-                        <span>Career Log #{jobIdx + 1}: {job.role} @ {job.company}</span>
-                        <button className="btn-delete-card" onClick={() => removeJob(jobIdx)}>
-                          <Trash2 size={14} /> Delete Position
-                        </button>
-                      </div>
+                <div className="form-group">
+                  <label>GitHub Personal Access Token (PAT)</label>
+                  <input 
+                    type="password" 
+                    value={githubToken} 
+                    onChange={(e) => {
+                      setGithubToken(e.target.value);
+                      localStorage.setItem('github_cms_token', e.target.value.trim());
+                    }} 
+                    placeholder="github_pat_... or ghp_..."
+                  />
+                </div>
+              </div>
 
-                      <div className="form-group-row">
-                        <div className="form-group">
-                          <label>Job Title</label>
-                          <input 
-                            type="text" 
-                            value={job.role} 
-                            onChange={(e) => handleJobChange(jobIdx, 'role', e.target.value)} 
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Company / Organization</label>
-                          <input 
-                            type="text" 
-                            value={job.company} 
-                            onChange={(e) => handleJobChange(jobIdx, 'company', e.target.value)} 
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Period / Timeframe</label>
-                          <input 
-                            type="text" 
-                            value={job.period} 
-                            onChange={(e) => handleJobChange(jobIdx, 'period', e.target.value)} 
-                          />
-                        </div>
-                      </div>
+              <hr className="divider" />
 
-                      <div className="job-tasks-editor">
-                        <div className="header-with-action-sub">
-                          <h5>Key Responsibilities logs</h5>
-                          <button className="btn-add-task-item" onClick={() => addTask(jobIdx)}>
-                            <Plus size={12} /> Add log line
+              {/* 1.5 Layout Re-ordering */}
+              <h3>Layout Section Alignment & Order</h3>
+              <p className="section-instruction">
+                Re-order components using the arrow keys, or check/uncheck to hide sections from rendering on the live page.
+              </p>
+              <div className="sections-list">
+                {ALL_AVAILABLE_SECTIONS.map((section) => {
+                  const isVisible = localConfig.sections.includes(section.id);
+                  const activeIndex = localConfig.sections.indexOf(section.id);
+
+                  return (
+                    <div className={`section-order-row ${isVisible ? 'visible' : 'hidden'}`} key={section.id}>
+                      <div className="section-row-left">
+                        <input 
+                          type="checkbox" 
+                          checked={isVisible} 
+                          onChange={() => toggleSectionVisibility(section.id)} 
+                        />
+                        <span className="section-label">{section.label}</span>
+                        <span className="section-id-tag">#{section.id}</span>
+                      </div>
+                      
+                      {isVisible && (
+                        <div className="section-row-actions">
+                          <button 
+                            className="btn-order-arrow" 
+                            disabled={activeIndex === 0}
+                            onClick={() => moveSection(activeIndex, 'up')}
+                            title="Move section up"
+                          >
+                            <ArrowUp size={14} />
+                          </button>
+                          <button 
+                            className="btn-order-arrow" 
+                            disabled={activeIndex === localConfig.sections.length - 1}
+                            onClick={() => moveSection(activeIndex, 'down')}
+                            title="Move section down"
+                          >
+                            <ArrowDown size={14} />
                           </button>
                         </div>
-                        
-                        {job.tasks.map((task: string, taskIdx: number) => (
-                          <div className="task-row-editor" key={taskIdx}>
-                            <input 
-                              type="text" 
-                              value={task} 
-                              onChange={(e) => handleTaskChange(jobIdx, taskIdx, e.target.value)} 
-                            />
-                            <button className="btn-delete-task-row" onClick={() => removeTask(jobIdx, taskIdx)}>
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: SKILLS (3D BALLS & CLI) */}
+          {activeTab === 'skills' && (
+            <div className="tab-pane">
+              <div className="header-with-action">
+                <div>
+                  <h3>3D Interactive Tech Spheres</h3>
+                  <p className="section-instruction">
+                    Add, delete, and customize color schemes for the physics canvas. If a tool icon is missing, text will automatically render on the sphere in 3D.
+                  </p>
+                </div>
+                <button className="btn-add-item" onClick={addSkill}>
+                  <Plus size={14} /> Add 3D Ball
+                </button>
+              </div>
+
+              <div className="skills-grid-editor">
+                {localConfig.skills.map((skill: any, idx: number) => (
+                  <div className="skill-card-editor" key={idx}>
+                    <div className="card-editor-header">
+                      <span>Sphere #{idx + 1}</span>
+                      <button className="btn-delete-card" onClick={() => removeSkill(idx)}>
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Tool / Technology Name</label>
+                      <input 
+                        type="text" 
+                        value={skill.name} 
+                        onChange={(e) => handleSkillChange(idx, 'name', e.target.value)} 
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Sphere Color</label>
+                      <select 
+                        value={skill.bg} 
+                        onChange={(e) => handleSkillChange(idx, 'bg', e.target.value)}
+                      >
+                        {PREDEFINED_COLORS.map(c => (
+                          <option key={c.hex} value={c.hex}>{c.name} ({c.hex})</option>
                         ))}
+                      </select>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <hr className="divider" />
+
+              <div className="header-with-action">
+                <div>
+                  <h3>CloudOps CLI Output Categories</h3>
+                  <p className="section-instruction">
+                    Configure output categories and items that appear in the interactive terminal console.
+                  </p>
+                </div>
+                <button className="btn-add-item" onClick={addCliCategory}>
+                  <Plus size={14} /> Add Category
+                </button>
+              </div>
+
+              <div className="categories-list-editor">
+                {Object.entries(localConfig.cliSkills || {}).map(([catName, skillsList]: [string, any], idx: number) => (
+                  <div className="category-row-editor" key={idx}>
+                    <div className="form-group cat-name-group">
+                      <label>Category Label</label>
+                      <input 
+                        type="text" 
+                        defaultValue={catName} 
+                        onBlur={(e) => handleCliCategoryNameChange(catName, e.target.value)} 
+                      />
+                    </div>
+                    <div className="form-group cat-skills-group">
+                      <label>Skills (comma separated)</label>
+                      <input 
+                        type="text" 
+                        value={skillsList.join(', ')} 
+                        onChange={(e) => handleCliSkillsChange(catName, e.target.value)} 
+                      />
+                    </div>
+                    <button className="btn-delete-row" onClick={() => removeCliCategory(catName)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: PROJECTS & CERTS */}
+          {activeTab === 'projects' && (
+            <div className="tab-pane">
+              <div className="header-with-action">
+                <div>
+                  <h3>Projects Showcase</h3>
+                  <p className="section-instruction">
+                    Manage featured projects, descriptions, and technology tags.
+                  </p>
+                </div>
+                <button className="btn-add-item" onClick={addProject}>
+                  <Plus size={14} /> Add Project
+                </button>
+              </div>
+
+              <div className="projects-list-editor">
+                {localConfig.projects.map((proj: any, idx: number) => (
+                  <div className="project-card-editor" key={proj.id || idx}>
+                    <div className="card-editor-header">
+                      <span>Project #{idx + 1}: {proj.title}</span>
+                      <button className="btn-delete-card" onClick={() => removeProject(idx)}>
+                        <Trash2 size={14} /> Delete Project
+                      </button>
+                    </div>
+
+                    <div className="form-group-row">
+                      <div className="form-group">
+                        <label>Project Title</label>
+                        <input 
+                          type="text" 
+                          value={proj.title} 
+                          onChange={(e) => handleProjectChange(idx, 'title', e.target.value)} 
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Live Demo URL</label>
+                        <input 
+                          type="text" 
+                          value={proj.liveUrl} 
+                          onChange={(e) => handleProjectChange(idx, 'liveUrl', e.target.value)} 
+                        />
                       </div>
                     </div>
-                  ))}
-                </div>
+
+                    <div className="form-group">
+                      <label>Project Description</label>
+                      <textarea 
+                        rows={3} 
+                        value={proj.desc} 
+                        onChange={(e) => handleProjectChange(idx, 'desc', e.target.value)} 
+                      />
+                    </div>
+
+                    <div className="form-group-row">
+                      <div className="form-group">
+                        <label>Tech Stack Tags (comma separated)</label>
+                        <input 
+                          type="text" 
+                          value={proj.tags?.join(', ') || ''} 
+                          onChange={(e) => handleProjectChange(idx, 'tags', e.target.value.split(',').map((s: string) => s.trim()))} 
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Repository / Source URL</label>
+                        <input 
+                          type="text" 
+                          value={proj.repoUrl || ''} 
+                          onChange={(e) => handleProjectChange(idx, 'repoUrl', e.target.value)} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            )}
 
-            {/* TAB 5: CHANGES TRACKER & TARGETED REVERT */}
-            {activeTab === 'changes' && (
-              <div className="tab-pane">
-                <div className="changes-header-bar">
-                  <div>
-                    <div className="section-title-with-badge">
-                      <h3>Changes Tracker & Diff Inspector</h3>
-                      <span className="theme-active-tag">7-Day Auto-Retention</span>
-                    </div>
-                    <p className="section-instruction">
-                      Inspect all modifications made in your active browser session compared against the official repository file. Edits automatically expire after 7 days to preserve performance and prevent stale storage.
-                    </p>
-                  </div>
+              <hr className="divider" />
 
-                  {detectedDiffs.length > 0 && !isReadOnly && (
-                    <button className="btn-discard-all" onClick={handleDiscardAllChanges}>
-                      <Undo2 size={16} /> Discard All Changes
-                    </button>
-                  )}
+              <div className="header-with-action">
+                <div>
+                  <h3>Certifications & Badges</h3>
+                  <p className="section-instruction">
+                    List your official industry certifications and badges.
+                  </p>
                 </div>
+                <button className="btn-add-item" onClick={addCert}>
+                  <Plus size={14} /> Add Certification
+                </button>
+              </div>
 
-                {detectedDiffs.length === 0 ? (
-                  <div className="clean-working-tree-card">
-                    <Sparkles size={32} className="clean-icon" />
-                    <h4>Working Tree is Clean</h4>
-                    <p>No differences detected between your active browser settings and the official repository configuration file.</p>
+              <div className="certs-list-editor">
+                {(localConfig.credentials?.certifications || []).map((cert: string, idx: number) => (
+                  <div className="cert-row-editor" key={idx}>
+                    <input 
+                      type="text" 
+                      value={cert} 
+                      onChange={(e) => handleCertChange(idx, e.target.value)} 
+                    />
+                    <button className="btn-delete-row" onClick={() => removeCert(idx)}>
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-                ) : (
-                  <div className="diff-list-container">
-                    <div className="diff-summary-bar">
-                      <span>Detected <strong>{detectedDiffs.length}</strong> active modification(s):</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: WORK EXPERIENCE */}
+          {activeTab === 'experience' && (
+            <div className="tab-pane">
+              <div className="header-with-action">
+                <div>
+                  <h3>Career History Timeline</h3>
+                  <p className="section-instruction">
+                    Manage jobs, contract positions, company names, and responsibility logs.
+                  </p>
+                </div>
+                <button className="btn-add-item" onClick={addJob}>
+                  <Plus size={14} /> Add Job Role
+                </button>
+              </div>
+
+              <div className="jobs-list-editor">
+                {localConfig.experience.map((job: any, jobIdx: number) => (
+                  <div className="job-card-editor" key={jobIdx}>
+                    <div className="card-editor-header">
+                      <span>Career Log #{jobIdx + 1}: {job.role} @ {job.company}</span>
+                      <button className="btn-delete-card" onClick={() => removeJob(jobIdx)}>
+                        <Trash2 size={14} /> Delete Position
+                      </button>
                     </div>
 
-                    <div className="diff-items-grid">
-                      {detectedDiffs.map((diff) => (
-                        <div className="diff-card" key={diff.id}>
-                          <div className="diff-card-header">
-                            <div className="diff-badge-group">
-                              <span className="diff-category-tag">{diff.category}</span>
-                              <span className="diff-field-name">{diff.label}</span>
-                            </div>
-                            {!isReadOnly && (
-                              <button className="btn-revert-single" onClick={diff.revertFn}>
-                                <Undo2 size={14} /> Revert
-                              </button>
-                            )}
-                          </div>
+                    <div className="form-group-row">
+                      <div className="form-group">
+                        <label>Job Title</label>
+                        <input 
+                          type="text" 
+                          value={job.role} 
+                          onChange={(e) => handleJobChange(jobIdx, 'role', e.target.value)} 
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Company / Organization</label>
+                        <input 
+                          type="text" 
+                          value={job.company} 
+                          onChange={(e) => handleJobChange(jobIdx, 'company', e.target.value)} 
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Period / Timeframe</label>
+                        <input 
+                          type="text" 
+                          value={job.period} 
+                          onChange={(e) => handleJobChange(jobIdx, 'period', e.target.value)} 
+                        />
+                      </div>
+                    </div>
 
-                          <div className="diff-comparison-box">
-                            <div className="diff-side diff-old">
-                              <span className="diff-label">Original:</span>
-                              <div className="diff-content">{diff.oldVal}</div>
-                            </div>
-                            <div className="diff-arrow">➔</div>
-                            <div className="diff-side diff-new">
-                              <span className="diff-label">Modified:</span>
-                              <div className="diff-content">{diff.newVal}</div>
-                            </div>
-                          </div>
+                    <div className="job-tasks-editor">
+                      <div className="header-with-action-sub">
+                        <h5>Key Responsibilities logs</h5>
+                        <button className="btn-add-task-item" onClick={() => addTask(jobIdx)}>
+                          <Plus size={12} /> Add log line
+                        </button>
+                      </div>
+                      
+                      {job.tasks.map((task: string, taskIdx: number) => (
+                        <div className="task-row-editor" key={taskIdx}>
+                          <input 
+                            type="text" 
+                            value={task} 
+                            onChange={(e) => handleTaskChange(jobIdx, taskIdx, e.target.value)} 
+                          />
+                          <button className="btn-delete-task-row" onClick={() => removeTask(jobIdx, taskIdx)}>
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       ))}
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: CHANGES TRACKER & TARGETED REVERT */}
+          {activeTab === 'changes' && (
+            <div className="tab-pane">
+              <div className="changes-header-bar">
+                <div>
+                  <div className="section-title-with-badge">
+                    <h3>Changes Tracker & Diff Inspector</h3>
+                    <span className="theme-active-tag">7-Day Auto-Retention</span>
+                  </div>
+                  <p className="section-instruction">
+                    Inspect all modifications made in your active browser session compared against the official repository file.
+                  </p>
+                </div>
+
+                {detectedDiffs.length > 0 && (
+                  <button className="btn-discard-all" onClick={handleDiscardAllChanges}>
+                    <Undo2 size={16} /> Discard All Changes
+                  </button>
                 )}
               </div>
-            )}
 
-          </fieldset>
+              {detectedDiffs.length === 0 ? (
+                <div className="clean-working-tree-card">
+                  <Sparkles size={32} className="clean-icon" />
+                  <h4>Working Tree is Clean</h4>
+                  <p>No differences detected between your active browser settings and the official repository configuration file.</p>
+                </div>
+              ) : (
+                <div className="diff-list-container">
+                  <div className="diff-summary-bar">
+                    <span>Detected <strong>{detectedDiffs.length}</strong> active modification(s):</span>
+                  </div>
+
+                  <div className="diff-items-grid">
+                    {detectedDiffs.map((diff) => (
+                      <div className="diff-card" key={diff.id}>
+                        <div className="diff-card-header">
+                          <div className="diff-badge-group">
+                            <span className="diff-category-tag">{diff.category}</span>
+                            <span className="diff-field-name">{diff.label}</span>
+                          </div>
+                          <button className="btn-revert-single" onClick={diff.revertFn}>
+                            <Undo2 size={14} /> Revert
+                          </button>
+                        </div>
+
+                        <div className="diff-comparison-box">
+                          <div className="diff-side diff-old">
+                            <span className="diff-label">Original:</span>
+                            <div className="diff-content">{diff.oldVal}</div>
+                          </div>
+                          <div className="diff-arrow">➔</div>
+                          <div className="diff-side diff-new">
+                            <span className="diff-label">Modified:</span>
+                            <div className="diff-content">{diff.newVal}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </main>
       </div>
     </div>
