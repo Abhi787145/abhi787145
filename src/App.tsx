@@ -118,7 +118,7 @@ function App() {
   };
 
   return (
-    <div className="app-root-container">
+    <div className="app-root-container" data-theme={config?.theme || 'cyber-cyan'}>
       <Cursor />
       <div className="grid-bg"></div>
       <Navbar config={config} />

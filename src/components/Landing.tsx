@@ -6,12 +6,14 @@ import './styles/Landing.css';
 const Landing = ({ config }: { config: any }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [activeTitleIdx, setActiveTitleIdx] = useState(0);
-  const titles = [
-    'Infrastructure Automator',
-    'CI/CD Pipeline Architect',
-    'Database Administrator',
-    'Cloud Systems Engineer'
-  ];
+  const titles = config?.titles && config.titles.length > 0
+    ? config.titles
+    : [
+        'Infrastructure Automator',
+        'CI/CD Pipeline Architect',
+        'Database Administrator',
+        'Cloud Systems Engineer'
+      ];
 
   // Title rotator effect
   useEffect(() => {
@@ -19,7 +21,7 @@ const Landing = ({ config }: { config: any }) => {
       setActiveTitleIdx((prev) => (prev + 1) % titles.length);
     }, 3000);
     return () => clearInterval(timer);
-  }, []);
+  }, [titles.length]);
 
   // Canvas floating nodes topology animation
   useEffect(() => {
